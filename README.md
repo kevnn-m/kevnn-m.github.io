@@ -1,6 +1,7 @@
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+---
 permalink: dist/index.html
-
+---
 <a name="readme-top"></a>
 
 <!--
