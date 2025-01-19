@@ -1,1 +1,1 @@
-User-agent: * Disallow: Sitemap: https://kevnn-m.github.io/al-folio/sitemap.xml
+User-agent: * Disallow: Sitemap: https://kevnn-m.github.io/sitemap.xml
