@@ -1,8 +1,8 @@
 ---
 layout: post
-date: 2015-10-22 15:59:00-0400
+date: 2024-03-18 15:59:00-0400
 inline: true
 related_posts: false
 ---
 
-A simple inline announcement.
+My <a href= 'https://ntrs.nasa.gov/citations/20240007543'>paper</a> on domain-specific inverse text normalization was accepted to AIAA Aviation 2024.
