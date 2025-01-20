@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href="mailto:khguo@usc.edu">email</a> | <a href = 'https://scholar.google.com/citations?user=3VM1a_oAAAAJ&hl=en'>scholar</a> Motto, Etc.
+subtitle: <a href="mailto:khguo@usc.edu">email</a> | <a href = 'https://scholar.google.com/citations?user=3VM1a_oAAAAJ&hl=en'>google scholar</a> Motto, Etc.
 
 profile:
   align: right
@@ -20,7 +20,7 @@ social: true # includes social icons at the bottom of the page
 
 I am an undergraduate student in Computer Science at the University of Southern California.
 
-My research is interested in Fairness, Accessibility, Transparency, and Ethics (FATE) in biomedical and healthcare AI. My work aims to improve the understanding ...
+My research is interested in Fairness, Accessibility, Transparency, and Ethics (FATE) in biomedical and healthcare AI. My work aims to improve our understanding ...
 
 <!-- Tell the world about yourself. Link to your favorite [subreddit](http://reddit.com). You can put a picture in, too. The code is already in, just name your picture `prof_pic.jpg` and put it in the `img/` folder. -->
 

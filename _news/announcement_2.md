@@ -7,7 +7,7 @@ inline: true
 related_posts: false
 ---
 
-My <a href = 'https://link.springer.com/article/10.1007/s12021-024-09694-2'>paper</a> on saliency methods for interpretable neuroimage deep learning was accepted to neuroinformatics.
+My <a href = 'https://link.springer.com/article/10.1007/s12021-024-09694-2'>paper</a> evaluating saliency methods for interpretable neuroimage deep learning was accepted to Neuroinformatics.
 
 <!-- Announcements and news can be much longer than just quick inline posts. In fact, they can have all the features available for the standard blog posts. See below.
 
