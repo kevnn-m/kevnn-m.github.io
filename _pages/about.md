@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href="mailto:khguo@usc.edu">email</a> | <a href = 'https://scholar.google.com/citations?user=3VM1a_oAAAAJ&hl=en'>google scholar</a> Motto, Etc.
+subtitle: <a href="mailto:khguo@usc.edu">email</a> | <a href = 'https://scholar.google.com/citations?user=3VM1a_oAAAAJ&hl=en'>google scholar</a>
 
 profile:
   align: right
