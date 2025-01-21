@@ -4,7 +4,7 @@
 
 title: blank # the website title (if blank, full name will be used instead)
 first_name: Kevin
-middle_name: H.
+middle_name: H
 last_name: Guo
 contact_note: >
   You can even add a little note about which of these is the best way to reach you.
@@ -283,7 +283,7 @@ display_categories: ["external-services"] # these categories will be displayed o
 
 scholar:
   last_name: [Guo]
-  first_name: [Kevin, H.]
+  first_name: [Kevin, H]
 
   style: apa
   locale: en
