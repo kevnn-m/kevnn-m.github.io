@@ -7,7 +7,7 @@ nav_order: 5
 # cv_pdf: example_pdf.pdf # you can also use external links here
 ---
 
-[CV](assets/Guo_Kevin_CV){:target="\_blank"}
+[CV](assets/Guo_Kevin_CV.pdf){:target="\_blank"}
 
 ### Experience
 
