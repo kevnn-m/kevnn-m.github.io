@@ -16,17 +16,17 @@ nav_order: 5
 University of Southern California, August 2023 -- Present
 
 - Research Assistant, [Irimia Lab](https://gero.usc.edu/labs/irimialab/)
-- Interpretable neuroimage deep learning
+- Interpretable neuroimage deep learning, advised by Dr. Andrei Irimia
 
 Vanderbilt University, Summer 2023
 
 - Research Intern, [Health Information Privacy Lab](https://hiplab.mc.vanderbilt.edu)
-- Privacy-preserving distributed deep learning
+- Privacy-preserving distributed deep learning for healthcare, advised by Dr. Bradley Malin
 
 NASA Ames Research Center, Summer 2022
 
 - AI/ML Research Intern, [NASA Aeronautics Research Institute](https://nari.arc.nasa.gov/research-areas)
-- NLP and digitization in air traffic management settings
+- NLP and digitization in air traffic management settings, advised by Stephen Clarke and Dr. Krishna Kalyanam
 
 <br>
 
