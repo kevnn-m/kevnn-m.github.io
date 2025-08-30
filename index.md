@@ -4,17 +4,15 @@ layout: homepage
 
 ## About Me
 
-Hello, I'm Kevin! I am a Ph.D. student at Vanderbilt University, advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/).
+Hello, I'm Kevin! I am a Ph.D. student at Vanderbilt University, advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). Broadly, my research is interested in creating robust and trustworthy machine learning systems for healthcare.
 
 Previously, I received a Bachelor's in Computer Science from the University of Southern California. At USC, I worked on [interpretable neuroimage deep learning](https://link.springer.com/article/10.1007/s12021-024-09694-2) advised by [Prof. Andrei Irimia](https://gero.usc.edu/labs/irimialab/). I also spent two years as an AI/ML Research Intern at NASA Ames working on [NLP for air traffic control](https://link.springer.com/article/10.1007/s12021-024-09694-2) under [Stephen Clarke](https://www.linkedin.com/in/ssbclarke/) and [Dr. Krishna Kalyanam](https://sites.google.com/site/krishnakalyanam) in the [NASA Aeronautics Research Institute](https://nari.arc.nasa.gov).
-
 
 I am grateful to be supported by the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program) and the [NLM T15](https://www.nlm.nih.gov/ep/GrantTrainInstitute.html).
 
 
-## Research Interests
-
-My Research is broadly interested in creating robust and trustworthy machine learning systems for healthcare.
+<!--## Research Interests
+<!--**How can we bridge the gap between rapid technological advancements and accessibility to these technologies in healthcare?** For example, LLMs are intuitively known to be strong "reasoners", applicable to a diverse set of tasks. Knowing this, why aren't AI agents more involved in the healthcare process, where access disparities, diagnostic mistakes, and financial challenges run rampant? My research seeks hopes to identify the questions preventing the implementation of LLMs in hospitals and advance ethical and robust solutions.-->
 
 <!--- **Computer Vision:** image recognition, image generation, video captioning
 - **Machine Learning:** meta-learning, incremental learning, transfer learning-->
