@@ -19,10 +19,10 @@ I am grateful to be supported by the [NSF GRFP](https://www.nsf.gov/funding/oppo
 
 ## News
 
-- **[Aug 2025]** Starting my PhD in Biomedical Informatics at Vanderbilt University!
-- **[Apr. 2025]** Honored to be selected for the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program).
-- **[Oct 2024]** [Paper](https://link.springer.com/article/10.1007/s12021-024-09694-2) on saliency methods for neuroimage deep learning was accepted to Neuroinformatics
-- **[Mar. 2024]** My first publication! My [paper](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=3VM1a_oAAAAJ&citation_for_view=3VM1a_oAAAAJ:u5HHmVD_uO8C) on inverse text normalization for air traffic control was accepted to AIAA Aviation.
+- **[8.2025]** Starting my PhD in Biomedical Informatics at Vanderbilt University!
+- **[4.2025]** Honored to be selected for the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program).
+- **[8.2024]** [Paper](https://link.springer.com/article/10.1007/s12021-024-09694-2) on saliency methods for neuroimage deep learning was accepted to Neuroinformatics
+- **[3.2024]** My first publication! My [paper](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=3VM1a_oAAAAJ&citation_for_view=3VM1a_oAAAAJ:u5HHmVD_uO8C) on inverse text normalization for air traffic control was accepted to AIAA Aviation.
 
 {% include_relative _includes/publications.md %}
 
