@@ -4,19 +4,27 @@ layout: homepage
 
 ## About Me
 
-I am a Ph.D. student at ...
+Hello, I'm Kevin! I am a Ph.D. student at Vanderbilt University, advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/).
+
+Previously, I received a Bachelor's in Computer Science from the University of Southern California. At USC, I worked on [interpretable neuroimage deep learning](https://link.springer.com/article/10.1007/s12021-024-09694-2) advised by [Prof. Andrei Irimia](https://gero.usc.edu/labs/irimialab/). I also spent two years as an AI/ML Research Intern at NASA Ames working on [NLP for air traffic control](https://link.springer.com/article/10.1007/s12021-024-09694-2) under [Stephen Clarke](https://www.linkedin.com/in/ssbclarke/) and [Dr. Krishna Kalyanam](https://sites.google.com/site/krishnakalyanam) in the [NASA Aeronautics Research Institute](https://nari.arc.nasa.gov).
+
+
+I am grateful to be supported by the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program) and the [NLM T15](https://www.nlm.nih.gov/ep/GrantTrainInstitute.html).
+
 
 ## Research Interests
 
-- **Computer Vision:** image recognition, image generation, video captioning
-- **Machine Learning:** meta-learning, incremental learning, transfer learning
+My Research is broadly interested in creating robust and trustworthy machine learning systems for healthcare.
+
+<!--- **Computer Vision:** image recognition, image generation, video captioning
+- **Machine Learning:** meta-learning, incremental learning, transfer learning-->
 
 ## News
 
-- **[Feb. 2020]** Our paper about incremental learning is accepted to CVPR 2020.
-- **[Feb. 2020]** We will host the ACM Multimedia Asia 2020 conference in Singapore!
-- **[Sept. 2019]** Our paper about few-shot learning is accepted to NeurIPS 2019.
-- **[Mar. 2019]** Our paper about few-shot learning is accepted to CVPR 2019.
+- **[Aug 2025]** Starting my PhD in Biomedical Informatics at Vanderbilt University!
+- **[Apr. 2025]** Honored to be selected for the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program).
+- **[Oct 2024]** [Paper](https://link.springer.com/article/10.1007/s12021-024-09694-2) on saliency methods for neuroimage deep learning was accepted to Neuroinformatics
+- **[Mar. 2024]** My first publication! My [paper](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=3VM1a_oAAAAJ&citation_for_view=3VM1a_oAAAAJ:u5HHmVD_uO8C) on inverse text normalization for air traffic control was accepted to AIAA Aviation.
 
 {% include_relative _includes/publications.md %}
 
