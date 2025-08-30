@@ -15,7 +15,7 @@ main:
     conference: American Institute of Aeronautics and Aviation <strong>(AIAA)</strong>, 2024.
     pdf: https://ntrs.nasa.gov/api/citations/20240007543/downloads/ITN_AIAA_Final_Manuscript.pdf
     # code: https://github.com/yaoyao-liu/class-incremental-learning/tree/main/mnemonics-training
-    page: https://class-il.mpi-inf.mpg.de/mnemonics/
+    # page: https://class-il.mpi-inf.mpg.de/mnemonics/
     # bibtex:
     # notes: Oral Presentation
     image: ./assets/img/nasa.png
