@@ -4,7 +4,7 @@ layout: homepage
 
 ## About Me
 
-Hello, I'm Kevin! I am a Ph.D. student at Vanderbilt University, advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research is broadly interested in creating robust and trustworthy machine learning systems for healthcare. I also run a [blog](https://kevnnm.substack.com).
+Hello, I'm Kevin! I am a Ph.D. student at Vanderbilt University, advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research is broadly interested in creating robust and trustworthy machine learning systems for healthcare. I also run a [blog](https://kevnnm.substack.com)!
 
 Previously, I received a Bachelor's in Computer Science from the University of Southern California. At USC, I worked on [interpretable neuroimage deep learning](https://link.springer.com/article/10.1007/s12021-024-09694-2) advised by [Prof. Andrei Irimia](https://gero.usc.edu/labs/irimialab/). I also spent two years as an AI/ML Research Intern at NASA Ames working on [NLP for air traffic control](https://link.springer.com/article/10.1007/s12021-024-09694-2) under [Stephen Clarke](https://www.linkedin.com/in/ssbclarke/) and [Dr. Krishna Kalyanam](https://sites.google.com/site/krishnakalyanam) in the [NASA Aeronautics Research Institute](https://nari.arc.nasa.gov).
 
