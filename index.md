@@ -10,6 +10,9 @@ Previously, I received a Bachelor's in Computer Science from the University of S
 
 I am grateful to be supported by the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program) and the [NLM T15](https://www.nlm.nih.gov/ep/GrantTrainInstitute.html).
 
+## Blog
+Check out my blog [here](kevnn-m.substack.com)!
+
 <!--## Research Interests
 <!--**How can we bridge the gap between rapid technological advancements and accessibility to these technologies in healthcare?** For example, LLMs are intuitively known to be strong "reasoners", applicable to a diverse set of tasks. Knowing this, why aren't AI agents more involved in the healthcare process, where access disparities, diagnostic mistakes, and financial challenges run rampant? My research seeks hopes to identify the questions preventing the implementation of LLMs in hospitals and advance ethical and robust solutions.-->
 
