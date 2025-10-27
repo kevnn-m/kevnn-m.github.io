@@ -4,12 +4,12 @@ layout: homepage
 
 ## About Me
 
-Hello, I'm Kevin! I am a Ph.D. student at Vanderbilt University, advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research is broadly interested in creating robust and trustworthy machine learning systems for healthcare. I also run a [blog](https://kevnnm.substack.com)!
+Hello, I'm Kevin! I am a Ph.D. student at Vanderbilt University, advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research is broadly interested in creating robust and trustworthy machine learning systems for healthcare.
 
 Currently, I'm working on
 
 1. LLM reasoning under uncertainty in clinical decision making.
-2. domain-invariant synthetic data for privacy-preserving and fairness-aware data sharing
+2. Harmonizing multi-site collaborations through data addition optimization and domain-invariant synthetic data generation
 
 Previously, I received a Bachelor's in Computer Science from the University of Southern California. At USC, I worked on [interpretable neuroimage deep learning](https://link.springer.com/article/10.1007/s12021-024-09694-2) advised by [Prof. Andrei Irimia](https://gero.usc.edu/labs/irimialab/). I also spent two years as an AI/ML Research Intern at NASA Ames working on [NLP for air traffic control](https://link.springer.com/article/10.1007/s12021-024-09694-2) under [Stephen Clarke](https://www.linkedin.com/in/ssbclarke/) and [Dr. Krishna Kalyanam](https://sites.google.com/site/krishnakalyanam) in the [NASA Aeronautics Research Institute](https://nari.arc.nasa.gov).
 
@@ -27,6 +27,8 @@ Check out my blog [here](kevnn-m.substack.com)!
 
 ## News
 
+- **[11.2025]** I'll be at AMIA 2025 in Atlanta, GA.
+- **[10.2025]** I'll be participating in VU's NSF GRFP panel.
 - **[8.2025]** Starting my PhD in Biomedical Informatics at Vanderbilt University!
 - **[4.2025]** Honored to be selected for the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program).
 - **[10.2024]** My manuscript on saliency methods for neuroimage deep learning was published in the latest issue of the Neuroinformatics journal. Read it [here](https://link.springer.com/article/10.1007/s12021-024-09694-2)!
