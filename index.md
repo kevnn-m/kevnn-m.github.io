@@ -43,7 +43,14 @@ Check out my blog [here](kevnn-m.substack.com)!
 - [Heuristics for Scientific Writing](https://www.approximatelycorrect.com/2018/01/29/heuristics-technical-scientific-writing-machine-learning-perspective/), Zachary Lipton
 - [How to Write ML Papers](https://sebastianfarquhar.com/on-research/2024/11/04/how_to_write_ml_papers/), Sebastian Farquhar
 
-<!-- ML fundamentals -->
+### AI, ML, and DL
+- [d2l.ai](https://d2l.ai)
+- [Very basic introduction to curiosity through an RL lens](https://francesco215.github.io/Bayes-bandit/)
+
+### Data Privacy
+- [Reflections on the Dagsthul Seminar on privacy for biomedical data sharing](https://desfontain.es/blog/dagstuhl-biomedical-data-sharing.html), Damien Desfontain
+
+
 <!-- Graduate Application Resources/Tips -->
 <!-- NSF GRFP Application Resources/Tips -->
 
