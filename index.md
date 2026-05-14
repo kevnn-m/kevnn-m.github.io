@@ -26,8 +26,8 @@ Check out my blog [here](kevnn-m.substack.com)!
 - **Machine Learning:** meta-learning, incremental learning, transfer learning-->
 
 ## News
-
-- **[12.2025]** Received Vanderbilt's Richard Bennett/Dorothy Danforth Compton Prize, which supports one enterring PhD student demonstrating potential in sciences and engineering.
+- **[5.2026]** Honored to receive Vanderbilt's Lacy-Fischer Fellowship, which supports an interdisciplinary demonstrating strong potential ($7,500)
+- **[12.2025]** Honored to receive Vanderbilt's Richard Bennett/Dorothy Danforth Compton Prize, which supports one enterring PhD student demonstrating potential in sciences and engineering ($2,500).
 - **[11.2025]** I'll be at AMIA 2025 in Atlanta, GA.
 - **[10.2025]** I'll be participating in VU's NSF GRFP panel.
 - **[8.2025]** Starting my PhD in Biomedical Informatics at Vanderbilt University!
