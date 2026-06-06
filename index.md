@@ -2,18 +2,20 @@
 layout: homepage
 ---
 
+I am a first year Ph.D. student hosted between Vanderbilt University and Vanderbilt University Medical Center advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research is supported by the [NLM T15](https://www.nlm.nih.gov/ep/GrantTrainInstitute.html) and the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program).
+
+# Research
+My research is broadly interested in improving the reliability of AI systems in complex high stakes decision making. This includes:
+
+- **Uncertainty in LLMs**: Foundation models frequently encounter ambiguous, noisy, or erroneous inputs. How can we accurately detect, measure, and mitigate uncertainty in black-box systems? My research investigates how this uncertainty (1) arises and affects the reliability and sycophancy in language models across multi-turn conversation, and (2) can be addressed through conformal prediction for cancer biomarking in whole slide images.
+
+- **Synthetic Data:** AI systems rely on complex data that is often siloed within healthcare institutions. My research leverages generative models to foster broader data sharing, accelerate scientific discovery, and improve clinical translation?
+
+
+
 ## About Me
-
-Hello, I'm Kevin! I am a Ph.D. student at Vanderbilt University, advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research is broadly interested in creating robust and trustworthy machine learning systems for healthcare.
-
-Currently, I'm working on
-
-1. LLM reasoning under uncertainty in clinical decision making.
-2. Harmonizing multi-site collaborations through data addition optimization and domain-invariant synthetic data generation
-
 Previously, I received a Bachelor's in Computer Science from the University of Southern California. At USC, I worked on [interpretable neuroimage deep learning](https://link.springer.com/article/10.1007/s12021-024-09694-2) advised by [Prof. Andrei Irimia](https://gero.usc.edu/labs/irimialab/). I also spent two years as an AI/ML Research Intern at NASA Ames working on [NLP for air traffic control](https://link.springer.com/article/10.1007/s12021-024-09694-2) under [Stephen Clarke](https://www.linkedin.com/in/ssbclarke/) and [Dr. Krishna Kalyanam](https://sites.google.com/site/krishnakalyanam) in the [NASA Aeronautics Research Institute](https://nari.arc.nasa.gov).
 
-I am grateful to be supported by the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program) and the [NLM T15](https://www.nlm.nih.gov/ep/GrantTrainInstitute.html).
 
 ## Blog
 
@@ -26,7 +28,7 @@ Check out my blog [here](kevnn-m.substack.com)!
 - **Machine Learning:** meta-learning, incremental learning, transfer learning-->
 
 ## News
-- **[5.2026]** Honored to receive Vanderbilt's Lacy-Fischer Fellowship, which supports an interdisciplinary demonstrating strong potential ($7,500)
+- **[5.2026]** Honored to receive Vanderbilt's interdisciplinary Lacy-Fischer Fellowship, which will support my research in longitudinal synthetic data for HIV ($7,500).
 - **[12.2025]** Honored to receive Vanderbilt's Richard Bennett/Dorothy Danforth Compton Prize, which supports one enterring PhD student demonstrating potential in sciences and engineering ($2,500).
 - **[11.2025]** I'll be at AMIA 2025 in Atlanta, GA.
 - **[10.2025]** I'll be participating in VU's NSF GRFP panel.
