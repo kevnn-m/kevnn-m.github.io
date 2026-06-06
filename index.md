@@ -2,7 +2,7 @@
 layout: homepage
 ---
 
-I am a first year Ph.D. student hosted between Vanderbilt University and Vanderbilt University Medical Center advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research is supported by the [NLM T15](https://www.nlm.nih.gov/ep/GrantTrainInstitute.html) and the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program).
+I am a first year Ph.D. student hosted between Vanderbilt University and Vanderbilt University Medical Center advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research is supported by the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program), the [NLM T15](https://www.nlm.nih.gov/ep/GrantTrainInstitute.html), and the [Intuit University Collaboration Program](https://www.intuit.com/ai/research/).
 
 # Research
 I'm broadly interested in improving the reliability of AI systems in high stakes environments. Specifically:
@@ -10,7 +10,6 @@ I'm broadly interested in improving the reliability of AI systems in high stakes
 - **Uncertainty in AI**: Foundation models frequently encounter ambiguous, noisy, or erroneous inputs. How can we detect, model, and mitigate uncertainty in black-box systems? Prior works have investigated how this uncertainty arises in language models and affects sycophancy and conformity across multi-turn conversation, and how conformal prediction methods can address uncertainty in clinical prediction tasks such as cancer biomarking.
 
 - **Synthetic Data:** Clinical AI systems rely on complex data that is often siloed within healthcare institutions. This prevents low resource groups which may benefit the most from data driven insights from harnessing the potential of predictive modelling. How can we leverage recent advances in generative models to foster broader data sharing, accelerate scientific discovery, and improve clinical translation?
-
 
 
 ## About Me
