@@ -39,6 +39,7 @@ Check out my blog [here](kevnn-m.substack.com)!
 
 ## Resources
 ### Research and Writing
+- [You and Your Research](https://www.cs.virginia.edu/~robins/YouAndYourResearch.html), Richard Hamming
 - [How I Think About My Research Process: Explore, Understand, Distill](https://www.lesswrong.com/posts/hjMy4ZxS5ogA9cTYK/how-i-think-about-my-research-process-explore-understand), Neel Nanda
 - [Highly Opinionated Advice on How to Write ML Papers](https://www.alignmentforum.org/posts/eJGptPbbFPZGLpjsp/highly-opinionated-advice-on-how-to-write-ml-papers), Neel Nanda
 - [Easy paper writing tips](https://ethanperez.net/easy-paper-writing-tips/), Ethan Perez
