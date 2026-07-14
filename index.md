@@ -50,6 +50,9 @@ Check out my blog [here](kevnn-m.substack.com)!
 - [d2l.ai](https://d2l.ai)
 - [Very basic introduction to curiosity through an RL lens](https://francesco215.github.io/Bayes-bandit/)
 
+### Uncertainty Quantification
+- [What’s Game-Theoretic About Statistics? A Game-Theoretic Notion of Evidence and Cooperative Skepticism](https://datascience.uchicago.edu/insights/whats-game-theoretic-about-statistics-a-game-theoretic-notion-of-evidence-and-cooperative-skepticism/), Yo Joong Choe and Aaditya Ramdas
+
 ### Data Privacy
 - [Reflections on the Dagsthul Seminar on privacy for biomedical data sharing](https://desfontain.es/blog/dagstuhl-biomedical-data-sharing.html), Damien Desfontain
 
