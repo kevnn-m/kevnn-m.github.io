@@ -55,6 +55,13 @@ example. Files with `draft: true` show only in `npm run dev`.
 Make `src/content/writing/<name>.md` with a `title` and `date` at the top.
 See `example-post.md`. Posts with `draft: true` show only in `npm run dev`.
 
+## Pixel scene (home-page banner)
+
+- Sprites and colors: `src/scene/sprites.ts`. Each sprite is a grid of
+  characters (one character = one pixel, `.` = transparent).
+- Animation (sky, wind, grass): `src/scene/scene.ts`.
+- Which objects link where: `src/components/PixelScene.astro`.
+
 ## Deploy
 
 Every push to `main` builds and deploys the site with GitHub Actions
