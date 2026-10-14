@@ -4,7 +4,11 @@ Personal site of Kevin Guo, built with [Astro](https://astro.build).
 
 ## Run it on your computer
 
-Needs Node.js 22.12 or newer.
+Needs Node.js 22.12 or newer (`node --version`). If you don't have it,
+install the LTS version from https://nodejs.org (or `brew install node` on a
+Mac). If you use nvm, `nvm use` reads the version from `.nvmrc`.
+
+Then, in the repo folder:
 
 ```sh
 npm install      # once, and after package.json changes
