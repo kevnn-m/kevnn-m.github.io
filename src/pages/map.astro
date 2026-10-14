@@ -4,7 +4,7 @@ import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 
 const places = await Promise.all(
-  (await getCollection('places')).map(async ({ data }) => ({
+  (await getCollection('places')).sort((a, b) => a.data.order - b.data.order).map(async ({ data }) => ({
     name: data.name,
     lat: data.lat,
     lng: data.lng,
@@ -25,8 +25,15 @@ const json = JSON.stringify(places).replace(/</g, '\\u003c');
     <div class="section">
       <div id="map" role="region" aria-label="Map of places visited"></div>
       <noscript><p class="empty">The map needs JavaScript.</p></noscript>
+      <!-- The same details as the map popups, for keyboard and screen-reader users. -->
       <ul class="list">
-        {places.map((p) => <li><b>{p.name}</b>{p.date && <span> · {p.date}</span>}</li>)}
+        {places.map((p) => (
+          <li>
+            <b>{p.name}</b>{p.date && <span> · {p.date}</span>}
+            {p.note && <span> · {p.note}</span>}
+            {p.photo && <> · <a href={p.photo}>photo</a></>}
+          </li>
+        ))}
       </ul>
     </div>
   </div>
@@ -49,9 +56,9 @@ const json = JSON.stringify(places).replace(/</g, '\\u003c');
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
 
-  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2f5fa7';
+  const pin = getComputedStyle(document.documentElement).getPropertyValue('--map-pin').trim() || '#2f5fa7';
   const markers = places.map((p) =>
-    L.circleMarker([p.lat, p.lng], { radius: 8, color: '#fff', weight: 2, fillColor: accent, fillOpacity: 0.95 })
+    L.circleMarker([p.lat, p.lng], { radius: 8, color: '#fff', weight: 2, fillColor: pin, fillOpacity: 0.95 })
       .bindPopup(
         `${p.photo ? `<img src="${esc(p.photo)}" alt="" width="240">` : ''}` +
           `<strong>${esc(p.name)}</strong>` +
@@ -71,4 +78,5 @@ const json = JSON.stringify(places).replace(/</g, '\\u003c');
   #map :global(.leaflet-popup-content img) { display: block; width: 240px; height: auto; border-radius: 6px; margin-bottom: 6px; }
   .list { margin: 16px 0 0; padding-left: 1.2rem; color: var(--text); }
   .list span { color: var(--muted); }
+  .list a { text-decoration: underline; text-underline-offset: 3px; }
 </style>

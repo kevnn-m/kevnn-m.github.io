@@ -6,8 +6,10 @@ import PubMeta from './PubMeta.astro';
 interface Props {
   pub: CollectionEntry<'publications'>;
   hasProject?: boolean;
+  headingLevel?: 2 | 3;
 }
-const { pub, hasProject = false } = Astro.props;
+const { pub, hasProject = false, headingLevel = 3 } = Astro.props;
+const H = headingLevel === 2 ? 'h2' : 'h3';
 const p = pub.data;
 const projectHref = hasProject ? `/publications/${pub.id}/` : undefined;
 const titleHref = projectHref ?? p.links.paper ?? p.links.arxiv ?? p.links.pdf;
@@ -17,13 +19,13 @@ const external = !projectHref;
   {p.figure && (
     <div class="fig">
       <a href={titleHref} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined} tabindex="-1" aria-hidden="true">
-        <Image src={p.figure} alt={p.figureAlt ?? ''} widths={[240, 480]} sizes="(max-width: 680px) 100vw, 220px" />
+        <Image src={p.figure} alt={p.figureAlt ?? ''} widths={[240, 480, 960, 1440]} sizes="(max-width: 680px) calc(100vw - 80px), 220px" />
       </a>
       {p.figureCredit && <small class="credit">{p.figureCredit}</small>}
     </div>
   )}
   <div>
-    <h3>{titleHref ? <a href={titleHref} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>{p.title}</a> : p.title}</h3>
+    <H class="pub-title">{titleHref ? <a href={titleHref} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>{p.title}</a> : p.title}</H>
     <PubMeta pub={pub} projectHref={projectHref}>
       <p class="tldr"><strong>TL;DR</strong> {p.tldr}</p>
     </PubMeta>
@@ -51,9 +53,9 @@ const external = !projectHref;
 
   .credit { display: block; margin-top: 4px; font-size: 0.72rem; line-height: 1.3; color: var(--muted); }
 
-  h3 { font-size: 1.08rem; }
-  h3 a { color: var(--text); }
-  h3 a:hover { color: var(--accent); }
+  .pub-title { font-size: 1.08rem; margin: 0 0 0.3rem; }
+  .pub-title a { color: var(--text); }
+  .pub-title a:hover { color: var(--accent); }
   .tldr { font-size: 0.95rem; margin: 0 0 6px; }
 
   @media (max-width: 680px) {

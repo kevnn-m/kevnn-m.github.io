@@ -6,11 +6,15 @@ import { getProjects } from '../lib/projects';
 interface Props {
   // Which tab is open first. 'selected' falls back to 'all' if no paper is selected.
   initial?: 'selected' | 'all';
+  // h2 on a page of its own, h3 under the home page's "Publications" heading.
+  headingLevel?: 2 | 3;
 }
-const { initial = 'selected' } = Astro.props;
+const { initial = 'selected', headingLevel = 3 } = Astro.props;
 
-// Newest first.
-const pubs = (await getCollection('publications')).sort((a, b) => b.data.date.localeCompare(a.data.date));
+// Newest first; papers from the same month keep their file order.
+const pubs = (await getCollection('publications')).sort(
+  (a, b) => b.data.date.localeCompare(a.data.date) || a.data.order - b.data.order,
+);
 const projectIds = new Set((await getProjects()).map((p) => p.id));
 const start = initial === 'selected' && pubs.some((p) => p.data.selected) ? 'selected' : 'all';
 ---
@@ -20,7 +24,7 @@ const start = initial === 'selected' && pubs.some((p) => p.data.selected) ? 'sel
     <button type="button" class="pill" data-mode="selected">Selected</button>
     <button type="button" class="pill" data-mode="all">All ({pubs.length})</button>
   </div>
-  {pubs.map((pub) => <PubCard pub={pub} hasProject={projectIds.has(pub.id)} />)}
+  {pubs.map((pub) => <PubCard pub={pub} hasProject={projectIds.has(pub.id)} headingLevel={headingLevel} />)}
 </div>
 
 <script>

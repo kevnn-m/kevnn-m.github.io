@@ -2,15 +2,17 @@
 import { SITE, NAV } from '../site';
 
 const path = Astro.url.pathname;
-const isCurrent = (href: string) =>
-  !href.includes('#') && (href === '/' ? path === '/' : path.startsWith(href));
+const isCurrent = (item: (typeof NAV)[number]) => {
+  const m = item.match ?? item.href;
+  return !m.includes('#') && (m === '/' ? path === '/' : path.startsWith(m));
+};
 ---
 <header class="topbar">
   <div class="wrap">
     <a class="wordmark" href="/">{SITE.name}</a>
     <nav aria-label="Main">
       {NAV.map((item) => (
-        <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+        <a href={item.href} aria-current={isCurrent(item) ? 'page' : undefined}>{item.label}</a>
       ))}
     </nav>
   </div>
@@ -33,4 +35,9 @@ const isCurrent = (href: string) =>
   nav a { color: var(--muted); padding: 2px 0; border-bottom: 2px solid transparent; }
   nav a:hover { color: var(--accent); text-decoration: none; }
   nav a[aria-current='page'] { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* On narrow screens the nav wraps; a tall sticky header would cover the page. */
+  @media (max-width: 640px) {
+    .topbar { position: static; }
+  }
 </style>

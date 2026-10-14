@@ -1,4 +1,5 @@
-# Places on the map. Copy one entry and edit it.
+# Places on the map. Copy one entry and edit it. The list under the map
+# follows the order written here.
 #   lat / lng: right-click a spot in Google Maps to copy the numbers.
 #   photo (optional): put the file in src/content/places/ and use ./places/<file>
 #

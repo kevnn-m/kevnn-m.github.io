@@ -3,11 +3,19 @@
 import { defineCollection } from 'astro:content';
 import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { parse } from 'yaml';
+
+// Keep entries in the order they are written in the file (Astro would
+// otherwise sort them by id). Plain YAML parsing also keeps dates such as
+// 2025-11-14 as text, so they show exactly as typed.
+const inFileOrder = (text: string) =>
+  (parse(text) as Record<string, unknown>[]).map((entry, i) => ({ ...entry, order: i }));
+const yamlFile = (path: string) => file(path, { parser: inFileOrder });
 
 const yearMonth = z.string().regex(/^\d{4}-\d{2}$/, 'Use the format YYYY-MM');
 
 const publications = defineCollection({
-  loader: file('src/content/publications.yaml'),
+  loader: yamlFile('src/content/publications.yaml'),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -22,6 +30,7 @@ const publications = defineCollection({
       figureCredit: z.string().optional(),
       note: z.string().optional(),
       selected: z.boolean().default(false),
+      order: z.number(),
       links: z
         .object({
           paper: z.url(),
@@ -37,10 +46,10 @@ const publications = defineCollection({
 });
 
 const experience = defineCollection({
-  loader: file('src/content/experience.yaml'),
+  loader: yamlFile('src/content/experience.yaml'),
   schema: z.object({
     title: z.string(),
-    order: z.number().default(0),
+    order: z.number(),
     items: z.array(
       z.object({
         what: z.string(),
@@ -53,18 +62,20 @@ const experience = defineCollection({
 });
 
 const photos = defineCollection({
-  loader: file('src/content/photos.yaml'),
+  loader: yamlFile('src/content/photos.yaml'),
   schema: ({ image }) =>
     z.object({
       image: image().optional(),
+      alt: z.string().optional(),
       caption: z.string().optional(),
       date: z.coerce.string().optional(),
       place: z.string().optional(),
+      order: z.number(),
     }),
 });
 
 const places = defineCollection({
-  loader: file('src/content/places.yaml'),
+  loader: yamlFile('src/content/places.yaml'),
   schema: ({ image }) =>
     z.object({
       name: z.string(),
@@ -73,6 +84,7 @@ const places = defineCollection({
       date: z.coerce.string().optional(),
       note: z.string().optional(),
       photo: image().optional(),
+      order: z.number(),
     }),
 });
 

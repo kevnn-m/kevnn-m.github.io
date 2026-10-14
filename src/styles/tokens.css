@@ -19,6 +19,9 @@
   --pub-3: #e2b8c8;
   --pub-4: #c9b8e2;
 
+  /* map pins. Set once here and not in dark mode, because the map tiles are always light. */
+  --map-pin: #2f5fa7;
+
   /* hero backdrop (placeholder; to be replaced by custom art) */
   --hero-bg:
     radial-gradient(60% 120% at 10% 0%, var(--accent-soft) 0%, transparent 60%),

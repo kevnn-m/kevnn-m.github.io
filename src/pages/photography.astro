@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 
-const photos = await getCollection('photos');
+const photos = (await getCollection('photos')).sort((a, b) => a.data.order - b.data.order);
 // A larger copy to open when a photo is clicked.
 const full = await Promise.all(
   photos.map((p) => (p.data.image ? getImage({ src: p.data.image, width: 2000 }) : null)),
@@ -21,7 +21,7 @@ const full = await Promise.all(
         <figure>
           {p.data.image ? (
             <a class="frame" href={full[i]!.src}>
-              <Image src={p.data.image} alt={p.data.caption ?? ''} widths={[400, 800]} sizes="(max-width: 560px) 50vw, 280px" />
+              <Image src={p.data.image} alt={p.data.alt || p.data.caption || (p.data.place ? `Photo from ${p.data.place}` : 'Photo')} widths={[400, 800]} sizes="(max-width: 560px) 50vw, 280px" />
             </a>
           ) : (
             <div class="frame placeholder" aria-hidden="true">📷</div>

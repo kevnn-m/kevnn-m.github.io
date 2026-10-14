@@ -39,12 +39,16 @@ img { max-width: 100%; height: auto; }
 .skip-link:focus { left: 8px; }
 
 /* sections on the home page and the inner pages */
-.section { padding: 48px 0 8px; }
-.page-head { padding: 48px 0 8px; }
+.section { padding-block: 48px 8px; }
+.page-head { padding-block: 48px 8px; }
 .page-head p { color: var(--muted); margin: 0; }
 
 /* Markdown content (bio, news, resources, posts) */
 .prose p { margin: 0 0 1rem; }
+/* Links inside running text are underlined, not shown by color alone. */
+.prose a, .page-head p a, .empty a {
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+}
 .prose ul { padding-left: 1.2rem; margin: 0 0 1rem; }
 .prose li { margin-bottom: 0.5rem; }
 .prose h2 { margin-top: 2rem; }

@@ -1,10 +1,9 @@
 # Experience, shown on the home page as one card per group.
-# Groups are shown by `order` (smallest first).
+# Groups and items show in the order written here.
 # Each item: what (required), where, when, link (all optional).
 
 - id: education
   title: Education
-  order: 1
   items:
     - what: Ph.D., Biomedical Informatics
       where: Vanderbilt University
@@ -14,7 +13,6 @@
 
 - id: research
   title: Research
-  order: 2
   items:
     - what: AI/ML Research Intern
       where: NASA Ames Research Center (NASA Aeronautics Research Institute)
@@ -24,7 +22,6 @@
 
 - id: honors
   title: Fellowships and Honors
-  order: 3
   items:
     - what: Lacy-Fischer Fellowship
       where: Vanderbilt University

@@ -1,5 +1,7 @@
 // Site-wide settings. Edit these values; every page reads from here.
 
+const EMAIL = 'kevin.guo.1@vanderbilt.edu';
+
 export const SITE = {
   name: 'Kevin Guo',
   // Shown under your name in the hero and in link previews.
@@ -7,11 +9,11 @@ export const SITE = {
   affiliation: 'Vanderbilt University',
   description:
     'Kevin Guo is a Ph.D. student at Vanderbilt University working on reliable AI systems for high-stakes settings.',
-  email: 'kevin.guo.1@vanderbilt.edu',
+  email: EMAIL,
 
   // Buttons under the bio. Remove a line to hide that button.
   links: [
-    { label: 'Email', href: 'mailto:kevin.guo.1@vanderbilt.edu', icon: 'email' },
+    { label: 'Email', href: `mailto:${EMAIL}`, icon: 'email' },
     { label: 'Scholar', href: 'https://scholar.google.com/citations?hl=en&user=3VM1a_oAAAAJ', icon: 'scholar' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/kevin-guo-644587236/', icon: 'linkedin' },
     { label: 'Substack', href: 'https://kevnnm.substack.com', icon: 'substack' },
@@ -29,11 +31,12 @@ export const SITE = {
   counter: { namespace: 'kevnn-m-github-io', key: 'visits', liveHost: 'kevnn-m.github.io' },
 } as const;
 
-export const NAV = [
+// `match` (optional): highlight the item on pages whose path starts with it.
+export const NAV: { label: string; href: string; match?: string }[] = [
   { label: 'About', href: '/' },
-  { label: 'Publications', href: '/#publications' },
+  { label: 'Publications', href: '/#publications', match: '/publications/' },
   { label: 'Writing', href: '/writing/' },
   { label: 'Photography', href: '/photography/' },
   { label: 'Map', href: '/map/' },
   { label: 'Resources', href: '/resources/' },
-] as const;
+];

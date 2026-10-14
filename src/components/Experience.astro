@@ -33,6 +33,7 @@ const groups = (await getCollection('experience')).sort((a, b) => a.data.order -
     padding: 6px 0; border-top: 1px solid var(--line);
   }
   li:first-child { border-top: 0; }
+  li a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
   .where { color: var(--muted); }
   .when { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
 </style>

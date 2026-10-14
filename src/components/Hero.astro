@@ -13,6 +13,7 @@ import { Content as About } from '../content/about.md';
     <div>
       <h1>{SITE.name}</h1>
       <p class="role">{SITE.role} · {SITE.affiliation}</p>
+      <p class="email"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
       <div class="prose bio"><About /></div>
       <div class="links">
         {SITE.links.map((l) => (
@@ -37,7 +38,8 @@ import { Content as About } from '../content/about.md';
     width: 220px; height: 220px; object-fit: cover; border-radius: 50%;
     border: 4px solid var(--surface); box-shadow: var(--shadow);
   }
-  .role { color: var(--muted); margin: 0 0 1rem; }
+  .role { color: var(--muted); margin: 0; }
+  .email { margin: 0 0 1rem; font-size: 0.95rem; }
   .bio { max-width: 60ch; }
   .links { display: flex; flex-wrap: wrap; gap: 8px; }
 

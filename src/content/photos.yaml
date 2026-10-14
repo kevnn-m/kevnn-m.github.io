@@ -1,10 +1,12 @@
-# Photography. Put the image file in src/content/photos/ and add an entry:
+# Photography. Put the image file in src/content/photos/ and add an entry.
+# Photos show in the order written here.
 #
 # - id: sunset-1                 # any unique name
 #   image: ./photos/sunset.jpg   # path from this file
 #   caption: Sunset over the lake
+#   alt: Orange sky over a lake   # optional; for screen readers if no caption
 #   place: Percy Priest Lake, TN
-#   date: June 2026
+#   date: June 2026               # any text; shown as written
 #
 # The three entries below are PLACEHOLDERS (no image). Delete them when you
 # add real photos. The footer counter only counts entries that have an image.
