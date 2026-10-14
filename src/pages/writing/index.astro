@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../site';
+
+// Drafts show only when the site runs on your computer.
+const posts = (await getCollection('writing', (p) => import.meta.env.DEV || !p.data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const substack = SITE.links.find((l) => l.icon === 'substack');
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+---
+<Base title="Writing">
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Writing</h1>
+      <p>Notes on research, AI, and other things.</p>
+    </div>
+
+    {posts.length === 0 ? (
+      <div class="section">
+        <p class="empty">
+          Posts are coming soon.{substack && <> For now, my writing is on <a href={substack.href}>Substack</a>.</>}
+        </p>
+      </div>
+    ) : (
+      <div class="rows section">
+        {posts.map((post) => (
+          <a class="row" href={`/writing/${post.id}/`}>
+            <span class="date">{fmt(post.data.date)}</span>
+            <span class="title">{post.data.title}{post.data.draft && <span class="draft"> (draft)</span>}</span>
+            {post.data.summary && <span class="summary">{post.data.summary}</span>}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</Base>
+
+<style>
+  .rows { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 0; }
+  .row {
+    display: grid; grid-template-columns: 96px 1fr; gap: 4px 24px;
+    padding: 18px 0; border-bottom: 1px solid var(--line); color: var(--text);
+  }
+  .row:hover { text-decoration: none; }
+  .row:hover .title { text-decoration: underline; text-underline-offset: 3px; }
+  .date { color: var(--muted); font-size: 0.9rem; padding-top: 2px; }
+  .title { font-weight: 600; }
+  .summary { grid-column: 2; color: var(--muted); font-size: 0.95rem; }
+  .draft { color: var(--muted); font-weight: 400; }
+  @media (max-width: 560px) {
+    .row { grid-template-columns: 1fr; }
+    .summary { grid-column: 1; }
+  }
+</style>

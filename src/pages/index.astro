@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import PubList from '../components/PubList.astro';
+import Experience from '../components/Experience.astro';
+import { Content as Research } from '../content/research.md';
+import { Content as News } from '../content/news.md';
+---
+<Base>
+  <Hero />
+  <div class="wrap">
+    <section class="section" id="research">
+      <h2>Research</h2>
+      <div class="prose"><Research /></div>
+    </section>
+
+    <section class="section" id="publications">
+      <h2>Publications</h2>
+      <PubList />
+    </section>
+
+    <section class="section" id="news">
+      <h2>News</h2>
+      <div class="prose news"><News /></div>
+    </section>
+
+    <section class="section" id="experience">
+      <h2>Experience</h2>
+      <Experience />
+    </section>
+  </div>
+</Base>
+
+<style>
+  .news :global(li) { margin-bottom: 0.6rem; }
+</style>

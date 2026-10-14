@@ -1,0 +1,54 @@
+---
+// One project page per file in src/content/projects/. The file name must
+// match a paper's id in src/content/publications.yaml.
+import { getEntry, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PubMeta from '../../components/PubMeta.astro';
+import { getProjects } from '../../lib/projects';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return Promise.all(
+    projects.map(async (project) => {
+      const pub = await getEntry('publications', project.id);
+      if (!pub) {
+        throw new Error(`src/content/projects/${project.id}.md has no paper with id "${project.id}" in publications.yaml`);
+      }
+      return { params: { id: project.id }, props: { project, pub } };
+    }),
+  );
+}
+
+const { project, pub } = Astro.props;
+const { Content } = await render(project);
+const p = pub.data;
+---
+<Base title={p.title} description={p.tldr}>
+  <article class="wrap project">
+    <div class="page-head">
+      <p><a href="/#publications">← Publications</a></p>
+      <h1>{p.title}</h1>
+      <PubMeta pub={pub} />
+    </div>
+    {p.figure && (
+      <figure class="teaser">
+        <Image src={p.figure} alt={p.figureAlt ?? ''} widths={[800, 1600]} sizes="(max-width: 880px) 100vw, 832px" />
+        {p.figureCredit && <figcaption>{p.figureCredit}</figcaption>}
+      </figure>
+    )}
+    <p class="tldr"><strong>TL;DR</strong> {p.tldr}</p>
+    <div class="prose"><Content /></div>
+  </article>
+</Base>
+
+<style>
+  .project h1 { font-size: 2rem; }
+  .teaser { margin: 32px 0 16px; }
+  .teaser :global(img) { width: 100%; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); }
+  .teaser figcaption { margin-top: 6px; font-size: 0.8rem; color: var(--muted); }
+  .tldr {
+    padding: 14px 18px; margin: 0 0 24px;
+    background: var(--accent-soft); border-radius: var(--radius);
+  }
+</style>

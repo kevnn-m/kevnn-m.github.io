@@ -1,0 +1,65 @@
+/* ============================================================
+   Design tokens. PLACEHOLDER values: change colors and fonts here,
+   and every page follows.
+   ============================================================ */
+
+:root {
+  /* colors (light) */
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --text: #1f2328;
+  --muted: #5f6670;
+  --line: #e6e2dc;
+  --accent: #2f5fa7;
+  --accent-soft: #e3ebf7;
+
+  /* the four colors that cycle on publication cards */
+  --pub-1: #9db7e0;
+  --pub-2: #a9d1b6;
+  --pub-3: #e2b8c8;
+  --pub-4: #c9b8e2;
+
+  /* hero backdrop (placeholder; to be replaced by custom art) */
+  --hero-bg:
+    radial-gradient(60% 120% at 10% 0%, var(--accent-soft) 0%, transparent 60%),
+    radial-gradient(50% 100% at 90% 100%, #eef3ea 0%, transparent 60%),
+    var(--bg);
+
+  /* type */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* shape */
+  --radius: 12px;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.06), 0 4px 14px rgb(0 0 0 / 0.04);
+  --maxw: 880px;
+
+  color-scheme: light;
+}
+
+/* colors (dark), used when the visitor's system is in dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131518;
+    --surface: #1b1e22;
+    --text: #e8e6e3;
+    --muted: #a2a8b0;
+    --line: #2c3036;
+    --accent: #8fb3ec;
+    --accent-soft: #1f2a3a;
+
+    --pub-1: #5677a8;
+    --pub-2: #4f8264;
+    --pub-3: #9a6178;
+    --pub-4: #7a66a0;
+
+    --hero-bg:
+      radial-gradient(60% 120% at 10% 0%, var(--accent-soft) 0%, transparent 60%),
+      radial-gradient(50% 100% at 90% 100%, #1c261f 0%, transparent 60%),
+      var(--bg);
+
+    --shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+
+    color-scheme: dark;
+  }
+}

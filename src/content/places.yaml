@@ -1,0 +1,19 @@
+# Places on the map. Copy one entry and edit it.
+#   lat / lng: right-click a spot in Google Maps to copy the numbers.
+#   photo (optional): put the file in src/content/places/ and use ./places/<file>
+#
+# These two are EXAMPLES taken from your news list. Edit or delete them.
+
+- id: nashville
+  name: Nashville, TN
+  lat: 36.1447
+  lng: -86.8027
+  date: August 2025 – present
+  note: Ph.D. at Vanderbilt University
+
+- id: atlanta-amia-2025
+  name: Atlanta, GA
+  lat: 33.7490
+  lng: -84.3880
+  date: November 2025
+  note: AMIA 2025 Annual Symposium

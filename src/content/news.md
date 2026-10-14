@@ -1,0 +1,8 @@
+- **[5.2026]** Honored to receive Vanderbilt's interdisciplinary Lacy-Fischer Fellowship, which will support my research in longitudinal synthetic data for HIV ($7,500).
+- **[12.2025]** Honored to receive Vanderbilt's Richard Bennett/Dorothy Danforth Compton Prize, which supports one entering PhD student demonstrating potential in sciences and engineering ($2,500).
+- **[11.2025]** I'll be at AMIA 2025 in Atlanta, GA.
+- **[10.2025]** I'll be participating in VU's NSF GRFP panel.
+- **[8.2025]** Starting my PhD in Biomedical Informatics at Vanderbilt University!
+- **[4.2025]** Honored to be selected for the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program).
+- **[10.2024]** My manuscript on saliency methods for neuroimage deep learning was published in the latest issue of Neuroinformatics. Read it [here](https://link.springer.com/article/10.1007/s12021-024-09694-2)!
+- **[3.2024]** My first publication! My paper on inverse text normalization for air traffic control was accepted to AIAA Aviation. Read about my work at NASA [here](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=3VM1a_oAAAAJ&citation_for_view=3VM1a_oAAAAJ:u5HHmVD_uO8C)!

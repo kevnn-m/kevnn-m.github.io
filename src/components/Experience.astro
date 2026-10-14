@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+
+const groups = (await getCollection('experience')).sort((a, b) => a.data.order - b.data.order);
+---
+<div class="groups">
+  {groups.map((g) => (
+    <div class="group">
+      <h3>{g.data.title}</h3>
+      <ul>
+        {g.data.items.map((item) => (
+          <li>
+            <span>
+              {item.link ? <a href={item.link} target="_blank" rel="noopener">{item.what}</a> : item.what}
+              {item.where && <span class="where">, {item.where}</span>}
+            </span>
+            {item.when && <span class="when">{item.when}</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</div>
+
+<style>
+  .group {
+    padding: 18px 20px; margin-bottom: 16px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 16px;
+    padding: 6px 0; border-top: 1px solid var(--line);
+  }
+  li:first-child { border-top: 0; }
+  .where { color: var(--muted); }
+  .when { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
+</style>

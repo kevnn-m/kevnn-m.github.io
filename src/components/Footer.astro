@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import { SITE } from '../site';
+
+const photoCount = (await getCollection('photos')).filter((p) => p.data.image).length;
+const year = new Date().getFullYear();
+---
+<footer>
+  <div class="wrap">
+    <span>© {year} {SITE.name}</span>
+    <div class="chips">
+      <span class="pill" id="visit-chip" hidden>
+        <span aria-hidden="true">👀</span> <span id="visit-count"></span> visits
+      </span>
+      <a class="pill" href="/photography/">
+        <span aria-hidden="true">📷</span> {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script is:inline define:vars={{ counter: SITE.counter }}>
+  // Public visit counter. Counts each browser once a day, and only on the
+  // live site. If the service is down, the chip stays hidden.
+  (async () => {
+    const base = `https://abacus.jasoncameron.dev`;
+    const path = `${counter.namespace}/${counter.key}`;
+    let seen = true;
+    const dayKey = 'visited-' + new Date().toISOString().slice(0, 10);
+    try { seen = !!localStorage.getItem(dayKey); localStorage.setItem(dayKey, '1'); } catch {}
+    const live = location.hostname === counter.liveHost;
+    try {
+      const res = await fetch(`${base}/${live && !seen ? 'hit' : 'get'}/${path}`);
+      if (!res.ok) return;
+      const { value } = await res.json();
+      document.getElementById('visit-count').textContent = Number(value).toLocaleString();
+      document.getElementById('visit-chip').hidden = false;
+    } catch {}
+  })();
+</script>
+
+<style>
+  footer { margin-top: 72px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+  .wrap {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px; padding-top: 24px; padding-bottom: 32px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill[hidden] { display: none; }
+</style>

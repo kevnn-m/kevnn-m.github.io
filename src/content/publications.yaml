@@ -1,0 +1,209 @@
+# Publications. Newest first is automatic (sorted by date).
+#
+# Fields:
+#   id:          short unique name; also the project page file name
+#                (src/content/projects/<id>.md) if you make one
+#   title, authors, venue, status (preprint | published), date (YYYY-MM), tldr
+#   venueDetail: full citation line shown instead of venue (optional)
+#   figure:      image in src/content/pubs/ (optional)
+#   figureAlt:   short description of the figure, for screen readers
+#   figureCredit: credit line shown under the figure (optional)
+#   note:        e.g. "Oral" or "Spotlight" (optional)
+#   selected:    true = shows in the "Selected" tab
+#   links:       paper, pdf, arxiv, code, poster, project (each optional)
+
+
+- id: hiv-synthetic-cohorts
+  title: "Generating synthetic multi-national longitudinal cohorts for clinically grounded HIV research"
+  authors:
+    - "Zhuohui J. Liang"
+    - "Zhuohang Li"
+    - "Nicholas J. Jackson"
+    - "Kevin H. Guo"
+    - "Yanink Caro-Vega"
+    - "Ronaldo I. Moreira"
+    - "Fabio Paredes"
+    - "Jordany Bernadin"
+    - "Diana Varela"
+    - "Carina Cesar"
+    - "Alessandro Blasimme"
+    - "Jessica M. Perkins"
+    - "Amir Asiaee"
+    - "Stephany N. Duda"
+    - "Bradley A. Malin"
+    - "Bryan E. Shepherd"
+    - "Chao Yan"
+  venue: "Nature Communications"
+  venueDetail: "Nature Communications 17, 7857 (2026)"
+  status: published
+  date: "2026-06"
+  tldr: "Introduces MeLD, a latent diffusion model that generates synthetic longitudinal cohorts of people living with HIV from CCASAnet data, outperforming existing methods on data utility, fidelity, and privacy."
+  figure: ./pubs/hiv-synthetic-cohorts.png
+  figureAlt: "An overview of the MeLD architecture, data quality evaluation framework, and corresponding overall model rankings."
+  figureCredit: "Figure from Liang et al., Nature Communications (2026), CC BY-NC-ND 4.0."
+  selected: true
+  links:
+    paper: https://doi.org/10.1038/s41467-026-74492-0
+    pdf: https://www.nature.com/articles/s41467-026-74492-0.pdf
+    code: https://github.com/jeffreyliang-vandy/MeLD
+
+- id: cora
+  title: "CoRA: Confidence-Rationale Alignment for Reliable Chain-of-Thought Reasoning"
+  authors:
+    - "Juming Xiong"
+    - "Weixin Liu"
+    - "Kevin Guo"
+    - "Congning Ni"
+    - "Junchao Zhu"
+    - "Chongyu Qu"
+    - "Chao Yan"
+    - "Katherine Brown"
+    - "Avinash Baidya"
+    - "Xiang Gao"
+    - "Bradley Malin"
+    - "Zhijun Yin"
+  venue: "arXiv preprint"
+  venueDetail: "arXiv:2606.14961"
+  status: preprint
+  date: "2026-06"
+  tldr: "A GRPO-based reinforcement learning method that rewards answer correctness, answer confidence, and rubric-judged rationale support reduces confidence-rationale misalignment by up to 26.51% on MedQA, MathQA, and OpenBookQA while keeping accuracy competitive."
+  figure: ./pubs/cora.png
+  figureAlt: "An example of confidence–rationale misalignment."
+  selected: false
+  links:
+    paper: https://arxiv.org/abs/2606.14961
+    pdf: https://arxiv.org/pdf/2606.14961
+
+- id: conformity-uncertainty
+  title: "It's Not Always Sycophancy: Measuring LLM Conformity as a Function of Epistemic Uncertainty"
+  authors:
+    - "Kevin H. Guo"
+    - "Chao Yan"
+    - "Avinash Baidya"
+    - "Katherine Brown"
+    - "Xiang Gao"
+    - "Juming Xiong"
+    - "Zhijun Yin"
+    - "Bradley A. Malin"
+  venue: "arXiv preprint"
+  venueDetail: "arXiv:2605.27288"
+  status: preprint
+  date: "2026-05"
+  tldr: "Introduces MUSE, a two-stage framework that maps an LLM's epistemic uncertainty against its likelihood of yielding to user pushback, separating sycophantic conformity from uncertainty-driven conformity."
+  figure: ./pubs/conformity-uncertainty.png
+  figureAlt: "The MUSE Framework."
+  selected: true
+  links:
+    paper: https://arxiv.org/abs/2605.27288
+    pdf: https://arxiv.org/pdf/2605.27288
+
+- id: clear
+  title: "CLEAR: Revealing How Noise and Ambiguity Degrade Reliability in LLMs for Medicine"
+  authors:
+    - "Kevin H. Guo"
+    - "Chao Yan"
+    - "Avinash Baidya"
+    - "Katherine Brown"
+    - "Xiang Gao"
+    - "Juming Xiong"
+    - "Zhijun Yin"
+    - "Bradley A. Malin"
+  venue: "arXiv preprint"
+  venueDetail: "arXiv:2605.01011"
+  status: preprint
+  date: "2026-05"
+  tldr: "CLEAR perturbs the number of plausible options, whether a correct or abstention option is present, and option framing on three medical benchmarks across 17 LLMs, showing more plausible answers and \"I don't know\" framing reduce reliability, with a humility deficit that worsens with scale."
+  figure: ./pubs/clear.png
+  figureAlt: "Overview of the CLEAR evaluation framework."
+  selected: true
+  links:
+    paper: https://arxiv.org/abs/2605.01011
+    pdf: https://arxiv.org/pdf/2605.01011
+
+- id: stop-listening
+  title: "Stop Listening to Me! How Multi-turn Conversations Can Degrade LLM Reliability"
+  authors:
+    - "Kevin H. Guo"
+    - "Chao Yan"
+    - "Avinash Baidya"
+    - "Katherine Brown"
+    - "Xiang Gao"
+    - "Juming Xiong"
+    - "Zhijun Yin"
+    - "Bradley A. Malin"
+  venue: "arXiv preprint"
+  venueDetail: "arXiv:2603.11394"
+  status: preprint
+  date: "2026-03"
+  tldr: "Evaluating 17 LLMs on three clinical benchmarks with a \"stick-or-switch\" framework, the paper finds that spreading a question's answer options across conversation turns lowers accuracy and abstention against incorrect suggestions by up to 30% on average."
+  figure: ./pubs/stop-listening.png
+  figureAlt: "Stick-or-Switch (SoS) Evaluation Framework."
+  selected: true
+  links:
+    paper: https://arxiv.org/abs/2603.11394
+    pdf: https://arxiv.org/pdf/2603.11394
+
+- id: confidence-aware-sampling
+  title: "Learning When to Sample: Confidence-Aware Selective Sampling for Efficient Chain-of-Thought Reasoning"
+  authors:
+    - "Juming Xiong"
+    - "Kevin Guo"
+    - "Congning Ni"
+    - "Weixin Liu"
+    - "Chao Yan"
+    - "Katherine Brown"
+    - "Avinash Baidya"
+    - "Xiang Gao"
+    - "Bradley Malin"
+    - "Zhijun Yin"
+  venue: "arXiv preprint"
+  venueDetail: "arXiv:2603.08999"
+  status: preprint
+  date: "2026-03"
+  tldr: "A decision model reads numeric and linguistic features from a single chain-of-thought trajectory to decide whether multi-path sampling is needed, keeping accuracy comparable to full and efficient multi-path baselines while using roughly 37-72% fewer tokens."
+  figure: ./pubs/confidence-aware-sampling.png
+  figureAlt: "Overview of the framework."
+  selected: false
+  links:
+    paper: https://arxiv.org/abs/2603.08999
+    pdf: https://arxiv.org/pdf/2603.08999
+
+- id: neuroimage-saliency
+  title: "Anatomic Interpretability in Neuroimage Deep Learning: Saliency Approaches for Typical Aging and Traumatic Brain Injury"
+  authors:
+    - "Kevin H. Guo"
+    - "Nikhil N. Chaudhari"
+    - "Tamara Jafar"
+    - "Nahian F. Chowdhury"
+    - "Paul Bogdan"
+    - "Andrei Irimia"
+    - "for the Alzheimer's Disease Neuroimaging Initiative"
+  venue: "Neuroinformatics"
+  venueDetail: "Neuroinformatics 22(4), 591–606 (2024)"
+  status: published
+  date: "2024-11"
+  tldr: "Compares seven attribution-based saliency methods for interpreting deep networks that estimate brain age from MRI in cognitively normal adults and adults with mild TBI, finding integrated gradients most reliably localizes known anatomic aging features."
+  figure: ./pubs/neuroimage-saliency.png
+  figureAlt: "Saliency probability maps (columns) averaged across all participants in the M_BA test set of 1,339 participants from ADNI, NACC, and UKBB."
+  selected: true
+  links:
+    paper: https://doi.org/10.1007/s12021-024-09694-2
+    pdf: https://link.springer.com/content/pdf/10.1007/s12021-024-09694-2.pdf
+
+- id: atc-itn
+  title: "Inverse Text Normalization of Air Traffic Control System Command Center Planning Telecon Transcriptions"
+  authors:
+    - "Kevin H. Guo"
+    - "Stephen S. B. Clarke"
+    - "Krishna M. Kalyanam"
+  venue: "AIAA AVIATION Forum"
+  venueDetail: "AIAA AVIATION Forum and ASCEND 2024, AIAA 2024-4360"
+  status: published
+  date: "2024-07"
+  tldr: "A hybrid inverse text normalization method, using a fine-tuned BERT model for conversational English and rule-based methods for aviation terms, formats ATCSCC planning telecon transcripts, reaching 25.56 PER and 5.47 WER PC."
+  figure: ./pubs/atc-itn.png
+  figureAlt: "Hybrid Neural and Rule-Based ITN Methodology"
+  selected: true
+  links:
+    paper: https://doi.org/10.2514/6.2024-4360
+    pdf: https://ntrs.nasa.gov/api/citations/20240007543/downloads/ITN_AIAA_Final_Manuscript.pdf

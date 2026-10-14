@@ -1,0 +1,17 @@
+# Photography. Put the image file in src/content/photos/ and add an entry:
+#
+# - id: sunset-1                 # any unique name
+#   image: ./photos/sunset.jpg   # path from this file
+#   caption: Sunset over the lake
+#   place: Percy Priest Lake, TN
+#   date: June 2026
+#
+# The three entries below are PLACEHOLDERS (no image). Delete them when you
+# add real photos. The footer counter only counts entries that have an image.
+
+- id: placeholder-1
+  caption: Photo placeholder
+- id: placeholder-2
+  caption: Photo placeholder
+- id: placeholder-3
+  caption: Photo placeholder

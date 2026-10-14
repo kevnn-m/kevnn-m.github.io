@@ -1,0 +1,3 @@
+I am a first year Ph.D. student hosted between Vanderbilt University and Vanderbilt University Medical Center advised by [Prof. Bradley Malin](https://hiplab.mc.vanderbilt.edu/people/malin/). My research focuses on designing reliable AI systems, and is supported by the [NSF GRFP](https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program), the [NLM T15](https://www.nlm.nih.gov/ep/GrantTrainInstitute.html), and the [Intuit University Collaboration Program](https://www.intuit.com/ai/research/).
+
+I'm broadly interested in improving the reliability of AI systems in high stakes environments, especially uncertainty in AI and synthetic data for healthcare.

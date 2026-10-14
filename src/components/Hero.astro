@@ -1,0 +1,50 @@
+---
+import { Image } from 'astro:assets';
+import { SITE } from '../site';
+import Icon from './Icon.astro';
+import headshot from '../assets/headshot.jpg';
+import { Content as About } from '../content/about.md';
+---
+<section class="hero">
+  <!-- Backdrop layer. Placeholder gradient for now; custom art goes here later. -->
+  <div class="backdrop" aria-hidden="true"></div>
+  <div class="wrap inner">
+    <Image class="portrait" src={headshot} alt={`Portrait of ${SITE.name}`} width={440} height={440} loading="eager" />
+    <div>
+      <h1>{SITE.name}</h1>
+      <p class="role">{SITE.role} · {SITE.affiliation}</p>
+      <div class="prose bio"><About /></div>
+      <div class="links">
+        {SITE.links.map((l) => (
+          <a class="pill" href={l.href} target={l.href.startsWith('http') ? '_blank' : undefined} rel="noopener me">
+            <Icon name={l.icon} size={15} />{l.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; border-bottom: 1px solid var(--line); overflow: hidden; }
+  .backdrop { position: absolute; inset: 0; background: var(--hero-bg); }
+  .inner {
+    position: relative;
+    display: grid; grid-template-columns: 220px 1fr; gap: 36px; align-items: center;
+    padding-top: 56px; padding-bottom: 56px;
+  }
+  .portrait {
+    width: 220px; height: 220px; object-fit: cover; border-radius: 50%;
+    border: 4px solid var(--surface); box-shadow: var(--shadow);
+  }
+  .role { color: var(--muted); margin: 0 0 1rem; }
+  .bio { max-width: 60ch; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  @media (max-width: 680px) {
+    .inner { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 20px; padding-top: 36px; }
+    .portrait { width: 160px; height: 160px; }
+    .bio { text-align: left; }
+    .links { justify-content: center; }
+  }
+</style>

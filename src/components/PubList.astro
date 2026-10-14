@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import PubCard from './PubCard.astro';
+import { getProjects } from '../lib/projects';
+
+interface Props {
+  // Which tab is open first. 'selected' falls back to 'all' if no paper is selected.
+  initial?: 'selected' | 'all';
+}
+const { initial = 'selected' } = Astro.props;
+
+// Newest first.
+const pubs = (await getCollection('publications')).sort((a, b) => b.data.date.localeCompare(a.data.date));
+const projectIds = new Set((await getProjects()).map((p) => p.id));
+const start = initial === 'selected' && pubs.some((p) => p.data.selected) ? 'selected' : 'all';
+---
+<div class="publist" data-start={start}>
+  <!-- Tabs stay hidden without JavaScript, so every paper shows. -->
+  <div class="tabs" role="group" aria-label="Filter publications" hidden>
+    <button type="button" class="pill" data-mode="selected">Selected</button>
+    <button type="button" class="pill" data-mode="all">All ({pubs.length})</button>
+  </div>
+  {pubs.map((pub) => <PubCard pub={pub} hasProject={projectIds.has(pub.id)} />)}
+</div>
+
+<script>
+  for (const list of document.querySelectorAll<HTMLElement>('.publist')) {
+    const tabs = list.querySelector<HTMLElement>('.tabs')!;
+    const buttons = tabs.querySelectorAll<HTMLButtonElement>('button');
+    const show = (mode: string) => {
+      for (const card of list.querySelectorAll<HTMLElement>('.pub')) {
+        card.hidden = mode === 'selected' && card.dataset.selected !== 'true';
+      }
+      for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
+    };
+    for (const b of buttons) b.addEventListener('click', () => show(b.dataset.mode!));
+    if (list.querySelector('.pub[data-selected="true"]')) {
+      tabs.hidden = false;
+      show(list.dataset.start!);
+    }
+  }
+</script>
+
+<style>
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tabs[hidden] { display: none; }
+  .tabs button { cursor: pointer; }
+  .tabs button[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .publist :global(.pub[hidden]) { display: none; }
+</style>

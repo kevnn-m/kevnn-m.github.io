@@ -1,0 +1,36 @@
+---
+import { SITE, NAV } from '../site';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) =>
+  !href.includes('#') && (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="topbar">
+  <div class="wrap">
+    <a class="wordmark" href="/">{SITE.name}</a>
+    <nav aria-label="Main">
+      {NAV.map((item) => (
+        <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .wrap {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 4px 24px; padding-top: 12px; padding-bottom: 12px;
+  }
+  .wordmark { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--text); }
+  .wordmark:hover { text-decoration: none; }
+  nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.95rem; }
+  nav a { color: var(--muted); padding: 2px 0; border-bottom: 2px solid transparent; }
+  nav a:hover { color: var(--accent); text-decoration: none; }
+  nav a[aria-current='page'] { color: var(--text); border-bottom-color: var(--accent); }
+</style>

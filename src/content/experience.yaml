@@ -1,0 +1,41 @@
+# Experience, shown on the home page as one card per group.
+# Groups are shown by `order` (smallest first).
+# Each item: what (required), where, when, link (all optional).
+
+- id: education
+  title: Education
+  order: 1
+  items:
+    - what: Ph.D., Biomedical Informatics
+      where: Vanderbilt University
+      when: 2025 – present
+    - what: B.S., Computer Science
+      where: University of Southern California
+
+- id: research
+  title: Research
+  order: 2
+  items:
+    - what: AI/ML Research Intern
+      where: NASA Ames Research Center (NASA Aeronautics Research Institute)
+    - what: Undergraduate Researcher
+      where: Irimia Lab, University of Southern California
+      link: https://gero.usc.edu/labs/irimialab/
+
+- id: honors
+  title: Fellowships and Honors
+  order: 3
+  items:
+    - what: Lacy-Fischer Fellowship
+      where: Vanderbilt University
+      when: 2026
+    - what: Richard Bennett/Dorothy Danforth Compton Prize
+      where: Vanderbilt University
+      when: 2025
+    - what: NSF Graduate Research Fellowship (GRFP)
+      when: 2025
+      link: https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program
+    - what: NLM T15 Training Program
+      link: https://www.nlm.nih.gov/ep/GrantTrainInstitute.html
+    - what: Intuit University Collaboration Program
+      link: https://www.intuit.com/ai/research/

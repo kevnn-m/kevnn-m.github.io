@@ -1,0 +1,74 @@
+---
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+
+const places = await Promise.all(
+  (await getCollection('places')).map(async ({ data }) => ({
+    name: data.name,
+    lat: data.lat,
+    lng: data.lng,
+    date: data.date ?? '',
+    note: data.note ?? '',
+    photo: data.photo ? (await getImage({ src: data.photo, width: 480 })).src : '',
+  })),
+);
+// Escape "<" so the JSON can't close the script tag early.
+const json = JSON.stringify(places).replace(/</g, '\\u003c');
+---
+<Base title="Map" description="Places I have visited during my Ph.D.">
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Map</h1>
+      <p>Places I've been during my Ph.D. Click a pin to see more.</p>
+    </div>
+    <div class="section">
+      <div id="map" role="region" aria-label="Map of places visited"></div>
+      <noscript><p class="empty">The map needs JavaScript.</p></noscript>
+      <ul class="list">
+        {places.map((p) => <li><b>{p.name}</b>{p.date && <span> · {p.date}</span>}</li>)}
+      </ul>
+    </div>
+  </div>
+  <script type="application/json" id="places-data" set:html={json} />
+</Base>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+
+  type Place = { name: string; lat: number; lng: number; date: string; note: string; photo: string };
+  const places: Place[] = JSON.parse(document.getElementById('places-data')!.textContent || '[]');
+
+  const esc = (s: string) =>
+    s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+  const map = L.map('map', { scrollWheelZoom: false, worldCopyJump: true }).setView([30, -40], 2);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2f5fa7';
+  const markers = places.map((p) =>
+    L.circleMarker([p.lat, p.lng], { radius: 8, color: '#fff', weight: 2, fillColor: accent, fillOpacity: 0.95 })
+      .bindPopup(
+        `${p.photo ? `<img src="${esc(p.photo)}" alt="" width="240">` : ''}` +
+          `<strong>${esc(p.name)}</strong>` +
+          `${p.date ? `<br><span>${esc(p.date)}</span>` : ''}` +
+          `${p.note ? `<br><span>${esc(p.note)}</span>` : ''}`,
+      )
+      .addTo(map),
+  );
+  if (markers.length) map.fitBounds(L.featureGroup(markers).getBounds(), { padding: [40, 40], maxZoom: 6 });
+</script>
+
+<style>
+  #map {
+    height: min(70vh, 560px); border-radius: var(--radius);
+    border: 1px solid var(--line); background: var(--accent-soft); z-index: 0;
+  }
+  #map :global(.leaflet-popup-content img) { display: block; width: 240px; height: auto; border-radius: 6px; margin-bottom: 6px; }
+  .list { margin: 16px 0 0; padding-left: 1.2rem; color: var(--text); }
+  .list span { color: var(--muted); }
+</style>

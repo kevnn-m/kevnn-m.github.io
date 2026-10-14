@@ -1,0 +1,54 @@
+---
+// Authors, venue line, and link buttons for one paper.
+// Used by the publication cards and by the project pages.
+import type { CollectionEntry } from 'astro:content';
+import { SITE } from '../site';
+
+interface Props {
+  pub: CollectionEntry<'publications'>;
+  projectHref?: string;
+}
+const { pub, projectHref } = Astro.props;
+const p = pub.data;
+
+const LINK_LABELS = { paper: 'Paper', pdf: 'PDF', arxiv: 'arXiv', code: 'Code', poster: 'Poster', project: 'Project site' } as const;
+const links: { label: string; href: string; external: boolean }[] = (Object.keys(LINK_LABELS) as (keyof typeof LINK_LABELS)[])
+  .filter((k) => p.links[k])
+  .map((k) => ({ label: LINK_LABELS[k], href: p.links[k]!, external: true }));
+if (projectHref) links.unshift({ label: 'Project page', href: projectHref, external: false });
+const isMe = (name: string) => (SITE.authorNames as readonly string[]).includes(name);
+---
+<p class="authors">
+  {p.authors.map((a, i) => (
+    <>{isMe(a) ? <strong>{a}</strong> : a}{i < p.authors.length - 1 ? ', ' : ''}</>
+  ))}
+</p>
+<p class="venue">
+  {p.status === 'preprint' && <span class="badge">Preprint</span>}
+  <em>{p.venueDetail ?? p.venue}</em>
+  {p.note && <span class="note">{p.note}</span>}
+</p>
+<slot />
+{links.length > 0 && (
+  <div class="links">
+    {links.map((l) => (
+      <a class:list={['pill', { internal: !l.external }]} href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>{l.label}</a>
+    ))}
+  </div>
+)}
+
+<style>
+  p { margin: 0 0 6px; }
+  .authors { font-size: 0.92rem; color: var(--muted); }
+  .authors strong { color: var(--text); }
+  .venue { font-size: 0.92rem; color: var(--muted); }
+  .badge {
+    display: inline-block; margin-right: 6px; padding: 0 8px;
+    border: 1px solid var(--line); border-radius: 999px;
+    font-size: 0.78rem; font-weight: 600;
+  }
+  .note { margin-left: 6px; font-weight: 600; color: var(--accent); }
+  .links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .links .pill { padding: 2px 10px; font-size: 0.8rem; }
+  .links .internal { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+</style>
