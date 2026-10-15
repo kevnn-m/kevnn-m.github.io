@@ -17,10 +17,23 @@ export const ramp = (...hex: string[]): Ramp =>
 const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 export const bayer = (x: number, y: number) => BAYER4[((y & 3) << 2) | (x & 3)];
 
+/** How wide the dithered zone between two ramp colors is (0 = hard steps, 1 = full). */
+export const DITHER = 0.5;
+
 /** The ramp color for value v (0..1) at pixel (x, y), dithered. */
 export function pick(r: Ramp, v: number, x: number, y: number): RGB {
-  const f = v * (r.length - 1) + (bayer(x, y) - 0.5);
+  const f = v * (r.length - 1) + (bayer(x, y) - 0.5) * DITHER;
   return r[Math.max(0, Math.min(r.length - 1, Math.round(f)))];
+}
+
+/** A smooth ramp of n colors through the given key colors (for gradients like the sky). */
+export function smoothRamp(n: number, ...hex: string[]): Ramp {
+  const keys = ramp(...hex);
+  return Array.from({ length: n }, (_, i) => {
+    const f = (i / (n - 1)) * (keys.length - 1);
+    const a = keys[Math.floor(f)], b = keys[Math.min(keys.length - 1, Math.floor(f) + 1)], k = f - Math.floor(f);
+    return [0, 1, 2].map((c) => Math.round(a[c] + (b[c] - a[c]) * k)) as RGB;
+  });
 }
 
 /** Write one pixel into ImageData. */

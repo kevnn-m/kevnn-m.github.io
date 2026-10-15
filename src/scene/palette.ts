@@ -1,12 +1,13 @@
 // Scene colors for day and night, as ramps from dark to light.
 // Each material is shaded with only the colors in its ramp (plus dithering),
 // so changing a ramp changes the whole look. PLACEHOLDER values: tune freely.
-import { ramp, type Ramp } from './pixel';
+import { ramp, smoothRamp, type Ramp } from './pixel';
 
 export interface ScenePalette {
   night: boolean;
   sky: Ramp; // top of the sky (index 0) to the horizon
-  cloud: Ramp; // shadow to highlight
+  cloud: Ramp; // 0 deepest shadow, 1 shadow, 2 soft shade, 3 white, 4 warm highlight
+  moonGlow: string; // the halo around the moon, painted over the clouds
   far: Ramp;
   mid: Ramp;
   near: Ramp; // the ground of our hillside, under the grass
@@ -18,8 +19,9 @@ export interface ScenePalette {
 
 export const DAY: ScenePalette = {
   night: false,
-  sky: ramp('#2462c4', '#2f78d8', '#4a91e2', '#6dabeb', '#95c6f1', '#bfdcf4', '#e2f1f6'),
-  cloud: ramp('#8592c4', '#a3b2d8', '#c6d3eb', '#e7eef7', '#ffffff', '#fffbe9'),
+  sky: smoothRamp(14, '#2462c4', '#3f86dc', '#79b3ec', '#b9daf3', '#e4f2f6'),
+  cloud: ramp('#b3c3dc', '#cfdbeb', '#e6edf6', '#ffffff', '#fffcf1'),
+  moonGlow: '',
   far: ramp('#58829f', '#6894ae', '#7ba6bd', '#91b8ca', '#acccd7'),
   mid: ramp('#2c6638', '#3a7a3f', '#4d9046', '#66a64e', '#84bc5b', '#a6d26b'),
   near: ramp('#3b772b', '#4c8c32', '#61a23a', '#7ab844', '#97cb55', '#badc70', '#d9ea96'),
@@ -31,8 +33,9 @@ export const DAY: ScenePalette = {
 
 export const NIGHT: ScenePalette = {
   night: true,
-  sky: ramp('#050a1d', '#08112b', '#0c1837', '#122246', '#192d56', '#223a67', '#2d4875'),
-  cloud: ramp('#161e3b', '#212b52', '#2e3a64', '#3f4c77', '#55638d', '#6d7ca4'),
+  sky: smoothRamp(12, '#050a1d', '#0c1837', '#192d56', '#2d4875'),
+  cloud: ramp('#16234a', '#1d2c56', '#253563', '#304272', '#5b6c95'),
+  moonGlow: 'rgba(255, 244, 200, 0.32)',
   far: ramp('#122138', '#182a44', '#1f344f', '#283f5b'),
   mid: ramp('#0b1d16', '#10261b', '#163021', '#1d3b29', '#254731'),
   near: ramp('#0e2418', '#132d1d', '#183723', '#1f422a', '#284f32', '#335c3b'),

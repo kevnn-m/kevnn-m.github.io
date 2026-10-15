@@ -19,7 +19,7 @@ const TILT = 6;
 /** Time used for the still frame (reduced motion): a moment with a nice gust. */
 const STILL_T = 14;
 /** Screen pixels per art pixel. */
-const pixelSize = (width: number) => (width >= 900 ? 3 : 2);
+const pixelSize = (_width: number) => 2;
 
 /** The grass the field is made of (art px): far blades short and thin, near ones tall and wide. */
 function fieldBlades(W: number, H: number): Float32Array {
@@ -42,19 +42,23 @@ function fieldBlades(W: number, H: number): Float32Array {
 }
 
 /**
- * Grass in front of the characters (art px). Blades grow from below the
- * illustration's ground line and stop a little above it (by `reach`), so the
- * grass covers where things touch the ground but not the people and objects.
+ * Grass just in front of the characters (art px): a band along the
+ * illustration's ground line, from x0 to x1. Tips stop a little above the
+ * line (by `reach`), so the grass covers where things touch the ground but
+ * not the people and objects.
  */
-function frontBlades(W: number, H: number, groundAt: (x: number) => number, reach: number): Float32Array {
+function frontBlades(W: number, H: number, x0: number, x1: number, groundAt: (x: number) => number, reach: number): Float32Array {
   const r = rng(81);
+  const top = ridge('near', W, H);
   const rows: number[][] = [];
-  for (let i = 0; i < Math.round(W * 0.9); i++) {
-    const x = -4 + r() * (W + 8);
+  const band = H * 0.04;
+  for (let i = 0; i < Math.round((x1 - x0) * 1.2); i++) {
+    const x = x0 + r() * (x1 - x0);
     const g = groundAt(x);
-    const y = g + 1 + r() * Math.max(2, H - g + 4);
+    const y = g + 1 + r() * band;
     const h = y - g + reach * (0.35 + r() * 0.65);
-    rows.push([x, y, h, 1.5 + r() * 1.5, r(), 1]);
+    const depth = (y - top(x)) / (H - top(x)); // same depth as the field here, so colors match
+    rows.push([x, y, h, 1 + 1.6 * depth + r() * 0.6, r(), depth]);
   }
   rows.sort((a, b) => a[1] - b[1]);
   return new Float32Array(rows.flat());
@@ -102,14 +106,15 @@ export function mountScene(root: HTMLElement) {
     paintMid(layers.mid, AW, AH, pal);
     paintNear(nearC, AW, AH, pal);
 
-    // The characters lie on the slope, a little left of center, head uphill.
-    // Position and size snap to whole art pixels so the pixel grids line up.
+    // The characters lie up the slope (a little away from us), left of
+    // center, head uphill. Position and size snap to whole art pixels so the
+    // pixel grids line up.
     const snap = (v: number) => Math.round(v / PX) * PX;
     const narrow = PW < 700;
-    const vw = snap(Math.min(PW * (narrow ? 0.96 : 0.54), PH * 1.8));
+    const vw = snap(Math.min(PW * (narrow ? 0.84 : 0.4), PH * 1.3));
     const vh = vw * 0.42;
-    const ground = PH * 0.86;
-    const cx = PW * (narrow ? 0.5 : 0.45);
+    const ground = PH * (narrow ? 0.8 : 0.76);
+    const cx = PW * (narrow ? 0.5 : 0.42);
     Object.assign(vigHost.style, {
       left: `${snap(cx - vw / 2)}px`,
       top: `${snap(ground - vh * (385 / 420))}px`,
@@ -122,7 +127,7 @@ export function mountScene(root: HTMLElement) {
     field.setBlades(fieldBlades(AW, AH));
     front.resize(AW, AH, PX);
     const slope = Math.tan((TILT * Math.PI) / 180);
-    front.setBlades(frontBlades(AW, AH, (x) => (ground + (x * PX - cx) * slope) / PX, (vh * 0.12) / PX));
+    front.setBlades(frontBlades(AW, AH, (cx - vw * 0.55) / PX, (cx + vw * 0.55) / PX, (x) => (ground + (x * PX - cx) * slope) / PX, (vh * 0.1) / PX));
     // The effects layer covers the scene itself (no margin).
     const FW = Math.ceil(W / PX), FH = Math.ceil(H / PX);
     flyers.resize(FW, FH, PX);

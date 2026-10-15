@@ -63,7 +63,8 @@ void main() {
   float v = mix(0.08, 0.78, vT) + (vSeed - 0.5) * 0.22 + vGust * vT * 0.5;
   v = mix(v, 0.62 + vT * 0.25, (1.0 - vDepth) * 0.55); // far grass is lighter, flatter
   float n = float(uRampN - 1);
-  int i = int(clamp(floor(v * n + bayer4(gl_FragCoord.xy)), 0.0, n));
+  // dithered step between ramp colors (0.5 = narrow dithered zone, like DITHER in pixel.ts)
+  int i = int(clamp(floor(v * n + 0.5 + (bayer4(gl_FragCoord.xy) - 0.5) * 0.5), 0.0, n));
   outColor = vec4(uRamp[i], 1.0);
 }`;
 
