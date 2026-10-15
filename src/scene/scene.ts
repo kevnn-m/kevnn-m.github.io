@@ -80,17 +80,20 @@ export function mountScene(root: HTMLElement) {
 
   let pal: ScenePalette = dark.matches ? NIGHT : DAY;
   const sky = new Sky(layers.sky);
-  const field = createGrass($<HTMLCanvasElement>('.l-field'));
-  const front = createGrass($<HTMLCanvasElement>('.l-front'));
+  let field = createGrass($<HTMLCanvasElement>('.l-field'));
+  let front = createGrass($<HTMLCanvasElement>('.l-front'));
   const fxC = $<HTMLCanvasElement>('.l-fx');
   const flyers = new Flyers(fxC);
   const vig = new Vignette(root, vigHost, () => reduced.matches, TILT);
   const colors = (): GrassColors => ({ ramp: pal.grass, flowers: pal.flowers });
 
-  let PX = 3;
+  let PX = 2;
+  let laidW = 0, laidH = 0; // the size the last layout was done for
   function layout() {
     const W = root.clientWidth, H = root.clientHeight;
     if (!W || !H) return;
+    laidW = W;
+    laidH = H;
     PX = pixelSize(W);
     const PW = W + MARGIN * 2, PH = H + MARGIN * 2;
     const AW = Math.ceil(PW / PX), AH = Math.ceil(PH / PX); // layer size in art px
@@ -102,6 +105,7 @@ export function mountScene(root: HTMLElement) {
     for (const c of root.querySelectorAll<HTMLCanvasElement>('canvas')) fit(c, AW, AH);
 
     sky.resize(AW, AH, pal);
+    sky.draw(running ? clock(last) : STILL_T); // resizing cleared the canvas
     paintFar(layers.far, AW, AH, pal);
     paintMid(layers.mid, AW, AH, pal);
     paintNear(nearC, AW, AH, pal);
@@ -109,19 +113,22 @@ export function mountScene(root: HTMLElement) {
     // The characters lie up the slope (a little away from us), left of
     // center, head uphill. Position and size snap to whole art pixels so the
     // pixel grids line up.
+    // Phones show it larger and centered; wide screens smaller and to the left,
+    // blending smoothly in between (no jump at a breakpoint).
     const snap = (v: number) => Math.round(v / PX) * PX;
-    const narrow = PW < 700;
-    const vw = snap(Math.min(PW * (narrow ? 0.88 : 0.43), PH * 1.4));
+    const k = Math.min(1, Math.max(0, (PW - 560) / 440));
+    const wide = k * k * (3 - 2 * k);
+    const vw = snap(Math.min(Math.max(PW * 0.43, Math.min(PW * 0.88, 520)), PH * 1.4));
     const vh = vw * 0.42;
-    const ground = PH * (narrow ? 0.8 : 0.76);
-    const cx = PW * (narrow ? 0.5 : 0.42);
+    const ground = PH * (0.8 - 0.04 * wide);
+    const cx = PW * (0.5 - 0.08 * wide);
     Object.assign(vigHost.style, {
       left: `${snap(cx - vw / 2)}px`,
       top: `${snap(ground - vh * (385 / 420))}px`,
       width: `${vw}px`,
       height: `${vh}px`,
     });
-    vig.setPixelSize((PX * 1000) / vw);
+    vig.setScale(PX, vw);
 
     field.resize(AW, AH, PX);
     field.setBlades(fieldBlades(AW, AH));
@@ -157,7 +164,6 @@ export function mountScene(root: HTMLElement) {
     }
   }
 
-  const grassAnimated = field.webgl;
   let frameNo = 0;
   function render(t: number, dt: number) {
     // Clouds move about one art pixel per second, so the sky only needs every other frame.
@@ -179,7 +185,8 @@ export function mountScene(root: HTMLElement) {
     if (now - last < 1000 / FPS - 2) return;
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
-    render(grassAnimated ? clock(now) : STILL_T, dt);
+    // Without WebGL the grass is a still image, so the wind clock stays still too.
+    render(field.webgl ? clock(now) : STILL_T, dt);
   };
   function update() {
     cancelAnimationFrame(raf);
@@ -196,8 +203,23 @@ export function mountScene(root: HTMLElement) {
   let pending = 0;
   new ResizeObserver(() => {
     cancelAnimationFrame(pending);
-    pending = requestAnimationFrame(layout);
+    pending = requestAnimationFrame(() => {
+      if (root.clientWidth !== laidW || root.clientHeight !== laidH) layout();
+    });
   }).observe(root);
+
+  // If the GPU drops a canvas (driver reset, too many tabs), rebuild when it comes back.
+  root.addEventListener('webglcontextlost', (e) => e.preventDefault(), true);
+  const rebuild = () => {
+    cancelAnimationFrame(pending);
+    pending = requestAnimationFrame(() => {
+      field = createGrass($<HTMLCanvasElement>('.l-field'));
+      front = createGrass($<HTMLCanvasElement>('.l-front'));
+      layout();
+    });
+  };
+  root.addEventListener('webglcontextrestored', rebuild, true);
+  root.addEventListener('contextrestored', rebuild, true);
   reduced.addEventListener('change', update);
   dark.addEventListener('change', () => { pal = dark.matches ? NIGHT : DAY; layout(); });
 

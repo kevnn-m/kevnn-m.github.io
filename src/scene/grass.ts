@@ -171,7 +171,7 @@ class WebGLGrass implements GrassRenderer {
   }
 }
 
-/** Fallback: the same blades as simple 2D strokes, drawn once. */
+/** Fallback: the same blades as simple 2D strokes, redrawn only when something changed. */
 class CanvasGrass implements GrassRenderer {
   readonly webgl = false;
   private data: Float32Array = new Float32Array(0);
@@ -179,16 +179,21 @@ class CanvasGrass implements GrassRenderer {
   private W = 1;
   private H = 1;
   private px = 1;
+  private drawn = '';
   constructor(private canvas: HTMLCanvasElement) {
     this.ctx = canvas.getContext('2d')!;
   }
-  setBlades(data: Float32Array) { this.data = data; }
+  setBlades(data: Float32Array) { this.data = data; this.drawn = ''; }
   resize(W: number, H: number, px: number) {
     Object.assign(this, { W, H, px });
     this.canvas.width = W;
     this.canvas.height = H;
+    this.drawn = '';
   }
   draw(t: number, c: GrassColors, gustStrength: number) {
+    const key = `${t}|${gustStrength}|${c.ramp[0]}`;
+    if (key === this.drawn) return;
+    this.drawn = key;
     const { ctx, data } = this;
     ctx.clearRect(0, 0, this.W, this.H);
     ctx.lineCap = 'butt';

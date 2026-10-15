@@ -9,7 +9,7 @@ import { parse } from 'yaml';
 // otherwise sort them by id). Plain YAML parsing also keeps dates such as
 // 2025-11-14 as text, so they show exactly as typed.
 const inFileOrder = (text: string) =>
-  (parse(text) as Record<string, unknown>[]).map((entry, i) => ({ ...entry, order: i }));
+  ((parse(text) ?? []) as Record<string, unknown>[]).map((entry, i) => ({ ...entry, order: i }));
 const yamlFile = (path: string) => file(path, { parser: inFileOrder });
 
 const yearMonth = z.string().regex(/^\d{4}-\d{2}$/, 'Use the format YYYY-MM');

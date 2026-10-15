@@ -44,8 +44,11 @@ function paintCloud(w: number, h: number, seed: number, pal: ScenePalette, tall:
       let best = -1, bp = puffs[0], bd = 2;
       const wob = (n(x * 0.12, y * 0.12) - 0.5) * 0.16;
       for (const p of puffs) {
-        const d = Math.hypot(x - p.x, y - p.y) / p.r + wob;
-        if (d < 1 && 1 - d > best) { best = 1 - d; bp = p; bd = d; }
+        // cheap box test first; most puffs are far from this pixel
+        const dx = x - p.x, dy = y - p.y, lim = p.r * (1 - wob);
+        if (Math.abs(dx) >= lim || Math.abs(dy) >= lim || dx * dx + dy * dy >= lim * lim) continue;
+        const d = Math.sqrt(dx * dx + dy * dy) / p.r + wob;
+        if (1 - d > best) { best = 1 - d; bp = p; bd = d; }
       }
       if (best < 0) continue;
       const brush = n(x * 0.06 + 7, y * 0.06) - 0.5; // wavy tone edges

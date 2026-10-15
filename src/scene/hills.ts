@@ -40,15 +40,17 @@ interface HillStyle {
 /** Base shading of a hill: crest light, darker going down, painted patches, lit slopes. */
 function paintHill(img: ImageData, top: Ridge, W: number, H: number, s: HillStyle) {
   const n = noise2(s.seed);
+  const fall = 1 / (H * s.fallDepth);
   for (let x = 0; x < W; x++) {
-    const t0 = Math.max(0, Math.ceil(top(x)));
+    const tx = top(x);
+    const t0 = Math.max(0, Math.ceil(tx));
     const slope = top(x + 1) - top(x - 1); // < 0 where the ground rises to the right (faces the sun)
     for (let y = t0; y < H; y++) {
-      const depth = Math.min(1, (y - top(x)) / (H * s.fallDepth));
+      const depth = Math.min(1, (y - tx) * fall);
       let v = s.top - depth * s.fall;
       v += (fbm(n, x * s.scale, y * s.scale * s.stretch, 3) - 0.5) * s.texture;
       v -= slope * 0.08;
-      if (y - top(x) < 1.5) v += 0.25; // rim light on the crest
+      if (y - tx < 1.5) v += 0.25; // rim light on the crest
       put(img, x, y, pick(s.ramp, v, x, y));
     }
   }

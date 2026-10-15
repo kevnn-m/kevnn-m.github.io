@@ -20,8 +20,8 @@ const svg = vignetteSvg.replace('aria-label="Cat"', `aria-label="${catName}"`);
   </div>
   <canvas class="l-fx" aria-hidden="true"></canvas>
 
-  <div class="scene-label" hidden></div>
-  <div class="cat-bubble" hidden>mrrp</div>
+  <div class="scene-label" hidden aria-hidden="true"></div>
+  <div class="cat-bubble" hidden aria-hidden="true">mrrp</div>
   <div class="cat-pop" id="cat-pop" role="dialog" aria-label={`${catName} photos`} hidden>
     <a href="/cat/">See {SITE.catName ? `${SITE.catName}'s` : 'cat'} photos →</a>
     <button type="button" class="cat-close" aria-label="Close">×</button>
@@ -55,15 +55,14 @@ const svg = vignetteSvg.replace('aria-label="Cat"', `aria-label="${catName}"`);
   canvas { display: block; pointer-events: none; image-rendering: pixelated; image-rendering: crisp-edges; }
 
   /* The script sets the exact place and size; this is the spot before it runs. */
-  .vignette { position: absolute; left: 20%; bottom: 8%; width: 56%; pointer-events: none; transform-origin: 50% 92%; }
-  .vignette :global(svg) { display: block; width: 100%; height: auto; pointer-events: none; overflow: visible; }
+  .vignette { position: absolute; left: 20%; bottom: 8%; width: 56%; pointer-events: none; }
+  .vignette :global(svg) { position: relative; display: block; width: 100%; height: auto; pointer-events: none; overflow: visible; }
   .vignette :global(svg a), .vignette :global(svg #cat) { pointer-events: auto; cursor: pointer; outline: none; }
-  .vignette :global(svg :is(a:hover, a:focus-visible) > g),
-  .vignette :global(svg #cat:is(:hover, :focus-visible)) {
-    filter: drop-shadow(0 0 3px #fffbe6) drop-shadow(0 0 9px rgba(255, 236, 160, 0.9));
-  }
+  /* Once the script draws the pixel copy, the SVG stays only for links, focus and hover. */
+  .vignette[data-raster] :global(svg) { opacity: 0; }
+  .vignette :global(.vignette-art) { position: absolute; image-rendering: pixelated; image-rendering: crisp-edges; }
   @media (prefers-color-scheme: dark) {
-    .vignette :global(svg) { filter: brightness(0.6) saturate(0.85); }
+    .vignette :global(:is(svg, .vignette-art)) { filter: brightness(0.6) saturate(0.85); }
   }
 
   /* Labels and popups in a pixel-game style, to match the art. */
