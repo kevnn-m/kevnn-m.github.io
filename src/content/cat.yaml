@@ -1,0 +1,16 @@
+# Cat photo album (opened from the cat on the home page).
+# Same fields as photos.yaml. Put images in src/content/cat/.
+#
+# - id: window-nap
+#   image: ./cat/window-nap.jpg
+#   caption: Afternoon nap by the window
+#   date: October 2026
+#
+# The entries below are PLACEHOLDERS (no image). Delete them when you add photos.
+
+- id: placeholder-1
+  caption: Cat photo placeholder
+- id: placeholder-2
+  caption: Cat photo placeholder
+- id: placeholder-3
+  caption: Cat photo placeholder

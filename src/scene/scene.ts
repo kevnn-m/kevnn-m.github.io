@@ -1,188 +1,183 @@
-// Draws the pixel scene: sky, clouds or stars, grass moving in the wind, and
-// the objects you can hover (each one is a real link placed over the canvas).
-import { CLOUD, PALETTES, SPRITES, type Palette, type Sprite } from './sprites';
+// Puts the scene together: layers, layout, animation loop, parallax,
+// day/night, reduced motion, and pausing when off screen.
+import { DAY, NIGHT, type ScenePalette } from './palette';
+import { Sky } from './sky';
+import { paintFar, paintMid, paintNear, ridge } from './hills';
+import { BLADE_FLOATS, createGrass, type GrassColors } from './grass';
+import { Flyers } from './flyers';
+import { Vignette } from './vignette';
+import { rng } from './wind';
 
-const H = 48; // canvas height in "pixels" (each is drawn as a 3x3 to 5x5 block)
-const GROUND = H - 4; // y of the ground line
-const SINK = 1; // how far objects sit down into the grass
-const GAP = 9; // pixels between objects
-const FPS = 20; // a low frame rate suits pixel art and saves battery
+/** Layers are this much larger than the scene on each side, so parallax never shows an edge. */
+const MARGIN = 20;
+const FPS = 40;
+/** The characters lie along the hillside, so the drawing is turned to follow it (degrees). */
+const TILT = 6;
+/** Time used for the still frame (reduced motion): a moment with a nice gust. */
+const STILL_T = 14;
 
-interface Blade { x: number; h: number; color: number; phase: number }
-interface Obj { el: HTMLAnchorElement; sprite: Sprite; x: number; y: number; w: number; h: number; hover: boolean }
+/** The grass the field is made of: far blades are short and thin, near ones tall and wide. */
+function fieldBlades(W: number, H: number): Float32Array {
+  const top = ridge('near', W, H);
+  let area = 0;
+  for (let x = 0; x < W; x += 10) area += (H - top(x)) * 10;
+  const n = Math.round(Math.min(26000, Math.max(3500, area / 26)));
+  const r = rng(71);
+  const rows: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    const x = -10 + r() * (W + 20);
+    const y0 = top(x);
+    const d = r() ** 1.4; // more blades far away, where they are small
+    const y = y0 + 1 + d * (H - y0 + 12);
+    const h = H * (0.012 + 0.03 * d + 0.1 * d * d) * (0.6 + r() * 0.8);
+    rows.push([x, y, h, 1.1 + 3.2 * d + r(), r(), d]);
+  }
+  rows.sort((a, b) => a[1] - b[1]); // far first, so near blades are drawn on top
+  return new Float32Array(rows.flat());
+}
 
-// Small seeded random, so the grass looks the same on every load.
-const rng = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-
-const spriteWidth = (s: Sprite) => Math.max(...s.map((row) => row.length));
+/**
+ * Grass in front of the characters. Blades grow from below the illustration's
+ * ground line and their tips stop a little above it (by `reach` px), so the
+ * grass covers where things touch the ground but not the people and objects.
+ */
+function frontBlades(W: number, H: number, groundAt: (x: number) => number, reach: number): Float32Array {
+  const r = rng(81);
+  const rows: number[][] = [];
+  for (let i = 0; i < Math.round(W / 1.6); i++) {
+    const x = -10 + r() * (W + 20);
+    const g = groundAt(x);
+    const y = g + 2 + r() * Math.max(4, H - g + 10);
+    const h = y - g + reach * (0.35 + r() * 0.65);
+    rows.push([x, y, h, 2 + r() * 4, r(), 1]);
+  }
+  rows.sort((a, b) => a[1] - b[1]);
+  return new Float32Array(rows.flat());
+}
 
 export function mountScene(root: HTMLElement) {
-  const canvas = root.querySelector('canvas')!;
-  const ctx = canvas.getContext('2d')!;
+  const $ = <T extends Element>(s: string) => root.querySelector<T>(s)!;
+  const layers = {
+    sky: $<HTMLCanvasElement>('.l-sky'),
+    far: $<HTMLCanvasElement>('.l-far'),
+    mid: $<HTMLCanvasElement>('.l-mid'),
+    plane: $<HTMLElement>('.l-plane'),
+  };
+  const nearC = $<HTMLCanvasElement>('.l-near');
+  const vigHost = $<HTMLElement>('.vignette');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const dark = matchMedia('(prefers-color-scheme: dark)');
-  let pal: Palette = dark.matches ? PALETTES.night : PALETTES.day;
+  const finePointer = matchMedia('(pointer: fine)');
 
-  const objs: Obj[] = [...root.querySelectorAll<HTMLAnchorElement>('a[data-sprite]')].map((el) => {
-    const sprite = SPRITES[el.dataset.sprite!];
-    return { el, sprite, x: 0, y: 0, w: spriteWidth(sprite), h: sprite.length, hover: false };
-  });
+  let pal: ScenePalette = dark.matches ? NIGHT : DAY;
+  const sky = new Sky(layers.sky);
+  const field = createGrass($<HTMLCanvasElement>('.l-field'));
+  const front = createGrass($<HTMLCanvasElement>('.l-front'));
+  const flyers = new Flyers($<HTMLCanvasElement>('.l-fx'));
+  const vig = new Vignette(root, vigHost, () => reduced.matches);
+  const colors = (): GrassColors => ({ base: pal.grassBase, tip: pal.grassTip, gust: pal.grassGust, far: pal.grassFar });
 
-  let W = 0;
-  let scale = 4;
-  let back: Blade[] = [];
-  let front: Blade[] = [];
-  let stars: { x: number; y: number; p: number }[] = [];
-
+  let W = 0, H = 0;
   function layout() {
-    scale = root.clientWidth >= 1000 ? 5 : root.clientWidth >= 560 ? 4 : 3;
-    W = Math.ceil(root.clientWidth / scale);
-    canvas.width = W;
-    canvas.height = H;
-    canvas.style.width = `${W * scale}px`;
-    canvas.style.height = `${H * scale}px`;
-    root.style.height = `${H * scale}px`;
+    W = root.clientWidth;
+    H = root.clientHeight;
+    if (!W || !H) return;
+    const PW = W + MARGIN * 2, PH = H + MARGIN * 2;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const dprGL = Math.min(devicePixelRatio || 1, 1.5);
 
-    // Objects sit in a row in the middle.
-    const total = objs.reduce((n, o) => n + o.w, 0) + GAP * (objs.length - 1);
-    let x = Math.floor((W - total) / 2);
-    for (const o of objs) {
-      o.x = x;
-      o.y = GROUND - o.h + SINK;
-      x += o.w + GAP;
-      const pad = 2; // make the link a little larger than the sprite
-      Object.assign(o.el.style, {
-        left: `${(o.x - pad) * scale}px`,
-        top: `${(o.y - pad) * scale}px`,
-        width: `${(o.w + pad * 2) * scale}px`,
-        height: `${(o.h + pad * 2) * scale}px`,
-      });
-    }
+    sky.resize(PW, PH, dpr, pal);
+    paintFar(layers.far, PW, PH, dpr, pal);
+    paintMid(layers.mid, PW, PH, dpr, pal);
+    paintNear(nearC, PW, PH, dpr, pal);
 
-    const r = rng(7);
-    back = [];
-    front = [];
-    for (let x = 0; x < W; x++) {
-      for (let i = 0; i < 2; i++) back.push({ x, h: 4 + Math.floor(r() * 7), color: Math.floor(r() * 3), phase: r() * 6 });
-      if (r() < 0.7) front.push({ x, h: 1 + Math.floor(r() * 4), color: Math.floor(r() * 3), phase: r() * 6 });
-    }
-    stars = Array.from({ length: Math.floor(W / 6) }, () => ({ x: Math.floor(r() * W), y: Math.floor(r() * (H - 18)), p: r() * 6 }));
-  }
-
-  // Wind: a steady sway plus gusts that roll across the field.
-  const wind = (x: number, t: number, phase: number) => {
-    const sway = Math.sin(t * 1.4 + x * 0.09 + phase * 0.3) * 0.9;
-    const gx = ((t * 28) % (W + 120)) - 60;
-    const gust = 2.6 * Math.exp(-(((x - gx) / 16) ** 2));
-    return sway + gust;
-  };
-
-  function px(x: number, y: number) {
-    ctx.fillRect(x, y, 1, 1);
-  }
-
-  function drawSky(t: number) {
-    const band = Math.ceil(H / pal.sky.length);
-    pal.sky.forEach((c, i) => {
-      ctx.fillStyle = c;
-      ctx.fillRect(0, i * band, W, band);
-      // dither the edge into the next band
-      if (i + 1 < pal.sky.length) {
-        ctx.fillStyle = pal.sky[i + 1];
-        for (let x = i % 2; x < W; x += 2) px(x, (i + 1) * band - 1);
-      }
+    // The characters lie on the slope, a little left of center, head uphill.
+    const narrow = PW < 700;
+    const vw = Math.min(PW * (narrow ? 0.96 : 0.54), PH * 1.8);
+    const vh = vw * 0.42;
+    const ground = PH * 0.86;
+    const cx = PW * (narrow ? 0.5 : 0.45);
+    Object.assign(vigHost.style, {
+      left: `${cx - vw / 2}px`,
+      top: `${ground - vh * (385 / 420)}px`,
+      width: `${vw}px`,
+      height: `${vh}px`,
+      transform: `rotate(${TILT}deg)`,
     });
-    if (pal.stars) {
-      for (const s of stars) {
-        ctx.fillStyle = Math.sin(t * 2 + s.p) > 0.6 ? '#ffffff' : '#9fb0d8';
-        px(s.x, s.y);
-      }
-      if (pal.moon) {
-        // Crescent: a disc with a second, offset disc cut out of it.
-        ctx.fillStyle = pal.moon;
-        const mx = W - 22, my = 9;
-        for (let dy = -5; dy <= 5; dy++) {
-          for (let dx = -5; dx <= 5; dx++) {
-            const inDisc = dx * dx + dy * dy <= 25;
-            const inCut = (dx - 2.4) ** 2 + dy * dy <= 4.6 ** 2;
-            if (inDisc && !inCut) px(mx + dx, my + dy);
-          }
-        }
-      }
-    } else {
-      [0, 1, 2].forEach((i) => {
-        const cx = Math.floor(((i * W) / 3 + t * (2 + i)) % (W + 20)) - 18;
-        drawSprite(CLOUD, cx, 3 + i * 5);
-      });
+
+    field.resize(PW, PH, dprGL);
+    field.setBlades(fieldBlades(PW, PH));
+    front.resize(PW, PH, dprGL);
+    const slope = Math.tan((TILT * Math.PI) / 180);
+    front.setBlades(frontBlades(PW, PH, (x) => ground + (x - cx) * slope, vh * 0.12));
+    flyers.resize(W, H, dpr);
+    flyers.night = pal.night;
+    vig.layout(MARGIN);
+    render(running ? clock(last) : STILL_T, 0);
+  }
+
+  // Parallax: layers follow the pointer by different amounts.
+  const target = { x: 0, y: 0 }, cur = { x: 0, y: 0 };
+  root.addEventListener('pointermove', (e) => {
+    if (!finePointer.matches || reduced.matches) return;
+    const r = root.getBoundingClientRect();
+    target.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    target.y = ((e.clientY - r.top) / r.height) * 2 - 1;
+  });
+  root.addEventListener('pointerleave', () => { target.x = 0; target.y = 0; });
+  const DEPTH = { sky: 3, far: 6, mid: 10, plane: 16 } as const;
+  function parallax(dt: number) {
+    const k = Math.min(1, dt * 4);
+    cur.x += (target.x - cur.x) * k;
+    cur.y += (target.y - cur.y) * k;
+    for (const [name, d] of Object.entries(DEPTH) as [keyof typeof DEPTH, number][]) {
+      layers[name].style.transform = `translate3d(${(-cur.x * d).toFixed(2)}px, ${(-cur.y * d * 0.5).toFixed(2)}px, 0)`;
     }
   }
 
-  function drawGrass(blades: Blade[], colors: string[], t: number, base: number) {
-    for (let c = 0; c < colors.length; c++) {
-      ctx.fillStyle = colors[c];
-      for (const b of blades) {
-        if (b.color !== c) continue;
-        const bend = wind(b.x, t, b.phase) * (b.h / 10);
-        for (let j = 0; j < b.h; j++) px(b.x + Math.round(bend * (j / b.h) ** 2), base - j);
-      }
-    }
+  const grassAnimated = field.webgl;
+  let frameNo = 0;
+  function render(t: number, dt: number) {
+    // Clouds move a few px per second, so the sky only needs every other frame.
+    if (!running || frameNo++ % 2 === 0) sky.draw(t);
+    field.draw(t, colors(), 0.9);
+    front.draw(t, colors(), 1);
+    vig.animate(t);
+    flyers.update(t, dt, running ? vig.paperSource() : null);
+    if (running) parallax(dt);
   }
 
-  function drawSprite(s: Sprite, x0: number, y0: number, outline?: string) {
-    if (outline) {
-      ctx.fillStyle = outline;
-      s.forEach((row, y) => [...row].forEach((ch, x) => {
-        if (ch !== '.') ctx.fillRect(x0 + x - 1, y0 + y - 1, 3, 3);
-      }));
-    }
-    s.forEach((row, y) => [...row].forEach((ch, x) => {
-      if (ch === '.') return;
-      ctx.fillStyle = pal.sprite[ch] ?? '#ff00ff';
-      px(x0 + x, y0 + y);
-    }));
-  }
-
-  function draw(t: number) {
-    drawSky(t);
-    ctx.fillStyle = pal.grassBack[0];
-    ctx.fillRect(0, GROUND + 1, W, H - GROUND - 1); // soil under the blades
-    drawGrass(back, pal.grassBack, t, GROUND);
-    for (const o of objs) drawSprite(o.sprite, o.x, o.y - (o.hover ? 1 : 0), o.hover ? pal.highlight : undefined);
-    drawGrass(front, pal.grassFront, t, H - 1);
-    ctx.fillStyle = pal.ground;
-    ctx.fillRect(0, H - 1, W, 1);
-  }
-
-  // Animation loop. Runs only while the scene is on screen and motion is allowed.
-  let visible = true;
-  let raf = 0;
-  let last = 0;
-  const loop = (now: number) => {
-    raf = requestAnimationFrame(loop);
-    if (now - last < 1000 / FPS) return;
+  // Animation loop: runs only while on screen, with motion allowed.
+  // The clock starts at the still frame's time, so nothing jumps when motion starts.
+  let visible = true, running = false, raf = 0, last = 0;
+  const start = performance.now();
+  const clock = (now: number) => STILL_T + (now - start) / 1000;
+  const frame = (now: number) => {
+    raf = requestAnimationFrame(frame);
+    if (now - last < 1000 / FPS - 2) return;
+    const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
-    draw(now / 1000);
+    render(grassAnimated ? clock(now) : STILL_T, dt);
   };
-  const update = () => {
+  function update() {
     cancelAnimationFrame(raf);
-    if (visible && !reduced.matches) raf = requestAnimationFrame(loop);
-    else draw(0);
-  };
-  const redrawIfStill = () => { if (reduced.matches || !visible) draw(0); };
-
-  for (const o of objs) {
-    const on = () => { o.hover = true; redrawIfStill(); };
-    const off = () => { o.hover = false; redrawIfStill(); };
-    o.el.addEventListener('pointerenter', on);
-    o.el.addEventListener('pointerleave', off);
-    o.el.addEventListener('focus', on);
-    o.el.addEventListener('blur', off);
+    running = visible && !reduced.matches;
+    if (running) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    } else {
+      render(STILL_T, 0);
+    }
   }
 
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; update(); }).observe(root);
-  new ResizeObserver(() => { layout(); draw(last / 1000); }).observe(root);
+  let pending = 0;
+  new ResizeObserver(() => {
+    cancelAnimationFrame(pending);
+    pending = requestAnimationFrame(layout);
+  }).observe(root);
   reduced.addEventListener('change', update);
-  dark.addEventListener('change', () => { pal = dark.matches ? PALETTES.night : PALETTES.day; redrawIfStill(); });
+  dark.addEventListener('change', () => { pal = dark.matches ? NIGHT : DAY; layout(); });
 
   layout();
   root.dataset.ready = 'true';

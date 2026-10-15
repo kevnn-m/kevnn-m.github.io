@@ -55,12 +55,25 @@ example. Files with `draft: true` show only in `npm run dev`.
 Make `src/content/writing/<name>.md` with a `title` and `date` at the top.
 See `example-post.md`. Posts with `draft: true` show only in `npm run dev`.
 
-## Pixel scene (home-page banner)
+## Home-page scene (banner)
 
-- Sprites and colors: `src/scene/sprites.ts`. Each sprite is a grid of
-  characters (one character = one pixel, `.` = transparent).
-- Animation (sky, wind, grass): `src/scene/scene.ts`.
-- Which objects link where: `src/components/PixelScene.astro`.
+A painted landscape drawn in code, with an illustration on top:
+
+| Part | File |
+|---|---|
+| Colors (day and night) | `src/scene/palette.ts` |
+| Sky, clouds, moon, stars | `src/scene/sky.ts` |
+| Hills (shapes, bushes) | `src/scene/hills.ts` |
+| Grass in the wind (WebGL) | `src/scene/grass.ts`, wind in `src/scene/wind.ts` |
+| Flying papers, fireflies | `src/scene/flyers.ts` |
+| The illustration (me, cat, book, papers, camera) | `src/scene/art/vignette.svg` |
+| Hover labels, idle motion, the cat | `src/scene/vignette.ts` |
+| Layout, parallax, animation loop | `src/scene/scene.ts` |
+| Markup and styles | `src/components/HomeScene.astro` |
+
+The links in the illustration are `<a>` elements inside the SVG; change their
+`href` there. The cat opens the album at `/cat/` (photos in
+`src/content/cat.yaml`). Set your cat's name in `src/site.ts` (`catName`).
 
 ## Deploy
 

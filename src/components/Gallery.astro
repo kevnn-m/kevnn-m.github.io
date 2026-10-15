@@ -1,0 +1,53 @@
+---
+// Photo grid used by the Photography page and the cat album.
+import { getCollection } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+
+interface Props {
+  album: 'photos' | 'cat';
+  placeholderIcon?: string;
+}
+const { album, placeholderIcon = '📷' } = Astro.props;
+
+const photos = (await getCollection(album)).sort((a, b) => a.data.order - b.data.order);
+// A larger copy to open when a photo is clicked.
+const full = await Promise.all(
+  photos.map((p) => (p.data.image ? getImage({ src: p.data.image, width: 2000 }) : null)),
+);
+---
+<div class="gallery">
+  {photos.map((p, i) => (
+    <figure>
+      {p.data.image ? (
+        <a class="frame" href={full[i]!.src}>
+          <Image src={p.data.image} alt={p.data.alt || p.data.caption || (p.data.place ? `Photo from ${p.data.place}` : 'Photo')} widths={[400, 800]} sizes="(max-width: 560px) 50vw, 280px" />
+        </a>
+      ) : (
+        <div class="frame placeholder" aria-hidden="true">{placeholderIcon}</div>
+      )}
+      {(p.data.caption || p.data.place || p.data.date) && (
+        <figcaption>
+          {p.data.caption && <b>{p.data.caption}</b>}
+          <span>{[p.data.place, p.data.date].filter(Boolean).join(' · ')}</span>
+        </figcaption>
+      )}
+    </figure>
+  ))}
+</div>
+
+<style>
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 28px 20px; }
+  @media (max-width: 560px) { .gallery { grid-template-columns: 1fr 1fr; gap: 20px 12px; } }
+  figure { margin: 0; }
+  .frame {
+    display: flex; align-items: center; justify-content: center;
+    aspect-ratio: 4 / 5; overflow: hidden;
+    background: var(--accent-soft); border-radius: 8px;
+  }
+  .frame :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+  a.frame:hover :global(img) { transform: scale(1.03); }
+  .placeholder { font-size: 2rem; border: 1px dashed var(--line); background: transparent; }
+  figcaption { margin-top: 10px; font-size: 0.92rem; }
+  figcaption b { display: block; font-weight: 600; }
+  figcaption span { color: var(--muted); }
+</style>

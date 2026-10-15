@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import Gallery from '../components/Gallery.astro';
+import { SITE } from '../site';
+
+const name = SITE.catName || 'The cat';
+---
+<Base title={name} description={`Photos of ${SITE.name}'s cat.`}>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>{name}</h1>
+      <p>Photos of my cat.</p>
+    </div>
+    <div class="section">
+      <Gallery album="cat" placeholderIcon="🐈‍⬛" />
+    </div>
+  </div>
+</Base>

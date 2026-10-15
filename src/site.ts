@@ -10,6 +10,8 @@ export const SITE = {
   description:
     'Kevin Guo is a Ph.D. student at Vanderbilt University working on reliable AI systems for high-stakes settings.',
   email: EMAIL,
+  // Your cat's name, shown when someone hovers or taps the cat. '' = "Cat".
+  catName: '',
 
   // Buttons under the bio. Remove a line to hide that button.
   links: [

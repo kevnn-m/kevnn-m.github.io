@@ -61,18 +61,22 @@ const experience = defineCollection({
   }),
 });
 
-const photos = defineCollection({
-  loader: yamlFile('src/content/photos.yaml'),
-  schema: ({ image }) =>
-    z.object({
-      image: image().optional(),
-      alt: z.string().optional(),
-      caption: z.string().optional(),
-      date: z.coerce.string().optional(),
-      place: z.string().optional(),
-      order: z.number(),
-    }),
-});
+const photoAlbum = (path: string) =>
+  defineCollection({
+    loader: yamlFile(path),
+    schema: ({ image }) =>
+      z.object({
+        image: image().optional(),
+        alt: z.string().optional(),
+        caption: z.string().optional(),
+        date: z.coerce.string().optional(),
+        place: z.string().optional(),
+        order: z.number(),
+      }),
+  });
+
+const photos = photoAlbum('src/content/photos.yaml');
+const cat = photoAlbum('src/content/cat.yaml');
 
 const places = defineCollection({
   loader: yamlFile('src/content/places.yaml'),
@@ -108,4 +112,4 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { publications, projects, experience, photos, places, writing };
+export const collections = { publications, projects, experience, photos, cat, places, writing };
