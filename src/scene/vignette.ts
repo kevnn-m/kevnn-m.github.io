@@ -10,6 +10,7 @@
 //
 // Hover or keyboard focus draws an outline ring around an object and shows
 // its label. The cat: tail flick + "mrrp", then a link to the photo album.
+import type { PageSource } from './flyers';
 import { gust } from './wind';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
@@ -65,7 +66,7 @@ export class Vignette {
   private labelFor: SVGElement | null = null;
   private flickStart = -1;
   private bubbleTimer = 0;
-  private paper: { x: number; y: number; size: number } | null = null;
+  private paper: PageSource | null = null;
   private layers: Layers | null = null;
   private rings = new Map<Element, HTMLCanvasElement | 'pending'>();
   private gen = 0;
@@ -360,16 +361,26 @@ export class Vignette {
       p.cx = r.x + r.w / 2 + offset;
       p.cy = r.y + r.h / 2 + offset;
     }
+    // The top sheet of the stack (data-sheet: center x, y, width, depth in SVG
+    // units), measured in the drawing's own layout, so the parallax shift
+    // is not included.
     const top = this.parts.find((p) => p.el.id === 'papers-top');
-    if (top) {
-      const r = this.rectIn(top.el);
-      this.paper = { x: (r.x + r.w * 0.6) / px, y: (r.y + r.h * 0.3) / px, size: Math.max(1, Math.min(2, r.w / px / 30)) };
+    const sheet = top?.el.dataset.sheet?.trim().split(/[\s,]+/).map(Number);
+    const m = top?.el.getCTM();
+    const host = this.svg?.parentElement;
+    if (sheet?.length === 4 && sheet.every(Number.isFinite) && m && host) {
+      const c = new DOMPoint(sheet[0], sheet[1]).matrixTransform(m);
+      const unit = Math.hypot(m.a, m.b) / px; // art px per SVG unit
+      this.paper = {
+        x: (host.offsetLeft - offset + c.x) / px, y: (host.offsetTop - offset + c.y) / px,
+        w: sheet[2] * unit, d: sheet[3] * unit, roll: Math.atan2(m.b, m.a),
+      };
     }
     if (!this.label.hidden && this.labelFor) this.place(this.label, this.labelFor);
     if (this.cat) for (const b of [this.bubble, this.pop]) if (!b.hidden) this.place(b, this.cat, 4);
   }
 
-  /** Where flying sheets start: the top of the paper stack, in art px. */
+  /** Where flying pages start: the top sheet of the stack, in art px (without the parallax shift). */
   paperSource() { return this.paper; }
 
   /** Per-frame movement. t in seconds (the scene's wind clock). */

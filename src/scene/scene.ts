@@ -21,6 +21,9 @@ const STILL_T = 14;
 /** Screen pixels per art pixel. */
 const pixelSize = (_width: number) => 2;
 
+/** Blade height at depth d (0 far .. 1 near), before random variation (art px). */
+const bladeHeight = (H: number, d: number) => H * (0.012 + 0.03 * d + 0.09 * d * d);
+
 /** The grass the field is made of (art px): far blades short and thin, near ones tall and wide. */
 function fieldBlades(W: number, H: number): Float32Array {
   const top = ridge('near', W, H);
@@ -34,7 +37,7 @@ function fieldBlades(W: number, H: number): Float32Array {
     const y0 = top(x);
     const d = r() ** 1.3; // more blades far away, where they are small
     const y = y0 + 1 + d * (H - y0 + 4);
-    const h = H * (0.012 + 0.03 * d + 0.09 * d * d) * (0.6 + r() * 0.8);
+    const h = bladeHeight(H, d) * (0.6 + r() * 0.8);
     rows.push([x, y, h, 1 + 1.6 * d + r() * 0.6, r(), d]);
   }
   rows.sort((a, b) => a[1] - b[1]); // far first, so near blades are drawn on top
@@ -42,23 +45,26 @@ function fieldBlades(W: number, H: number): Float32Array {
 }
 
 /**
- * Grass just in front of the characters (art px): a band along the
- * illustration's ground line, from x0 to x1. Tips stop a little above the
- * line (by `reach`), so the grass covers where things touch the ground but
- * not the people and objects.
+ * Grass just in front of the characters (art px), along the illustration's
+ * ground line from x0 to x1. Tips stop a little above the line (by `reach`),
+ * so the grass covers where things touch the ground but not the people and
+ * objects. The blades are as tall as the field's at the same depth, rooted
+ * lower to make up for it, so they bend in the wind just as far.
  */
 function frontBlades(W: number, H: number, x0: number, x1: number, groundAt: (x: number) => number, reach: number): Float32Array {
   const r = rng(81);
   const top = ridge('near', W, H);
+  const depthAt = (x: number, y: number) => Math.min(1, (y - top(x)) / (H - top(x)));
   const rows: number[][] = [];
-  const band = H * 0.025;
   for (let i = 0; i < Math.round((x1 - x0) * 0.8); i++) {
     const x = x0 + r() * (x1 - x0);
-    const g = groundAt(x);
-    const y = g + 1 + r() * band;
-    const h = y - g + reach * (0.35 + r() * 0.65);
-    const depth = (y - top(x)) / (H - top(x)); // same depth as the field here, so colors match
-    rows.push([x, y, h, 1 + 1.6 * depth + r() * 0.6, r(), depth]);
+    const tip = groundAt(x) - reach * (0.35 + r() * 0.65);
+    const k = 0.7 + r() * 0.6;
+    // The height depends on the depth of the root, which depends on the height: settle it in a few steps.
+    let y = groundAt(x);
+    for (let j = 0; j < 3; j++) y = tip + bladeHeight(H, depthAt(x, y)) * k;
+    const depth = depthAt(x, y); // same depth as the field here, so sizes and colors match
+    rows.push([x, y, y - tip, 1 + 1.6 * depth + r() * 0.6, r(), depth]);
   }
   rows.sort((a, b) => a[1] - b[1]);
   return new Float32Array(rows.flat());
@@ -154,6 +160,7 @@ export function mountScene(root: HTMLElement) {
   });
   root.addEventListener('pointerleave', () => { target.x = 0; target.y = 0; });
   const DEPTH = { sky: 3, far: 6, mid: 10, plane: 16 } as const;
+  const planeShift = { x: 0, y: 0 }; // art px, so flying pages start where the stack is now
   function parallax(dt: number) {
     const k = Math.min(1, dt * 4);
     cur.x += (target.x - cur.x) * k;
@@ -161,6 +168,7 @@ export function mountScene(root: HTMLElement) {
     for (const [name, d] of Object.entries(DEPTH) as [keyof typeof DEPTH, number][]) {
       const x = Math.round((-cur.x * d) / PX) * PX, y = Math.round((-cur.y * d * 0.5) / PX) * PX;
       layers[name].style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      if (name === 'plane') { planeShift.x = x / PX; planeShift.y = y / PX; }
     }
   }
 
@@ -171,7 +179,8 @@ export function mountScene(root: HTMLElement) {
     field.draw(t, colors(), 0.9);
     front.draw(t, colors(), 1);
     vig.animate(t);
-    flyers.update(t, dt, running ? vig.paperSource() : null);
+    const src = running ? vig.paperSource() : null;
+    flyers.update(t, dt, src && { ...src, x: src.x + planeShift.x, y: src.y + planeShift.y });
     if (running) parallax(dt);
   }
 
