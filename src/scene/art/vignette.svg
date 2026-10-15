@@ -1,0 +1,37 @@
+<svg id="vignette" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420">
+  <!-- TEMPORARY placeholder shapes; replaced by the final illustration. -->
+  <a id="link-papers" href="/publications/" aria-label="Publications">
+    <g id="papers">
+      <rect x="90" y="345" width="120" height="40" rx="3" fill="#f4f1e6" stroke="#3b2a20" stroke-width="2"/>
+      <g id="papers-top"><rect x="100" y="335" width="100" height="12" rx="2" fill="#fffdf6" stroke="#3b2a20" stroke-width="2"/></g>
+    </g>
+  </a>
+  <a id="link-person" href="#about" aria-label="About me">
+    <g id="person">
+      <circle cx="300" cy="345" r="32" fill="#f0c9a5" stroke="#3b2a20" stroke-width="2"/>
+      <g id="hair" data-pivot="290 330"><path d="M268 340 q10-40 50-30 q-20 5-22 25z" fill="#1f1d22"/></g>
+      <rect x="330" y="330" width="190" height="55" rx="26" fill="#f6f6f2" stroke="#3b2a20" stroke-width="2"/>
+      <path d="M520 360 l70-60 l70 85" fill="none" stroke="#3a4258" stroke-width="26" stroke-linejoin="round"/>
+    </g>
+  </a>
+  <a id="link-book" href="/writing/" aria-label="Writing">
+    <g id="book">
+      <rect x="380" y="255" width="90" height="60" rx="3" fill="#a3533d" stroke="#3b2a20" stroke-width="2"/>
+      <g id="book-page" data-pivot="425 285"><rect x="425" y="260" width="40" height="50" fill="#fffaf0" stroke="#3b2a20" stroke-width="1.5"/></g>
+    </g>
+  </a>
+  <g id="cat" role="button" tabindex="0" aria-label="Cat">
+    <ellipse cx="610" cy="345" rx="45" ry="42" fill="#1f2128"/>
+    <ellipse cx="610" cy="355" rx="25" ry="30" fill="#f7f5f0"/>
+    <circle cx="610" cy="285" r="32" fill="#1f2128"/>
+    <path d="M610 270 l-12 40 h24z" fill="#f7f5f0"/>
+    <g id="cat-tail" data-pivot="650 375"><path d="M650 375 q60 0 70-40" fill="none" stroke="#1f2128" stroke-width="16" stroke-linecap="round"/></g>
+  </g>
+  <a id="link-camera" href="/photography/" aria-label="Photography">
+    <g id="camera">
+      <rect x="800" y="340" width="90" height="45" rx="6" fill="#2a2d33" stroke="#3b2a20" stroke-width="2"/>
+      <circle cx="845" cy="362" r="15" fill="#6fa8dc" stroke="#c8ccd2" stroke-width="4"/>
+      <g id="camera-strap"><path d="M800 350 q-40 30 -20 40 q60 10 120 -10" fill="none" stroke="#7b4a2e" stroke-width="5"/></g>
+    </g>
+  </a>
+</svg>
