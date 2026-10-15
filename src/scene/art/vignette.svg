@@ -118,7 +118,7 @@
 <path d="M54.5,393.5L83,335.5" fill="none" stroke="#cbbd9c" stroke-width="7" stroke-dasharray="2.6 2.4"/>
 <path d="M945.5,394.2L917.5,337" fill="none" stroke="#cbbd9c" stroke-width="7" stroke-dasharray="2.6 2.4"/>
 </g>
-<a id="link-papers" href="/publications/" aria-label="Publications">
+<a id="link-papers" href="#publications" aria-label="Publications" data-label="150 316">
 <g id="papers">
 <path d="M75.6,390.8L157.7,383.5L144.4,357.2L62.3,364.5Z" fill="#fbf6ea"/><path d="M75.6,390.8L157.7,383.5L144.4,357.2L62.3,364.5Z" fill="none" stroke="#8f7c62" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M76.9,367.1L130.1,362.3M77,377.4L143.5,371.4M81.9,387.2L121.8,383.7" fill="none" stroke="#9aaecb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
@@ -163,7 +163,7 @@
 <path d="M123,332.7L125.2,332.3L126.4,338.2L124.2,338.6Z" fill="#c0c3c8"/>
 </g>
 </g></a>
-<a id="link-person" href="#about" aria-label="About me">
+<a id="link-person" href="#about" aria-label="About me" data-label="245 252">
 <g id="person">
 <use href="#kv-fhand2" fill="#e7a987"/>
 <g clip-path="url(#kv-fhand2c)">
@@ -353,7 +353,7 @@
 </g>
 <use href="#kv-palm27" fill="none" stroke="#9a5a42" stroke-width="2.5" stroke-linejoin="round"/>
 </g></a>
-<a id="link-book" href="/writing/" aria-label="Writing">
+<a id="link-book" href="/writing/" aria-label="Writing" data-label="320 148" data-pop="pop-writing">
 <g id="book">
 <path d="M311.1,178C311.1,178 303,180.7 298.2,184C293.3,187.2 282.1,197.6 282.1,197.6C282.1,197.6 319.1,250.5 319.1,250.5C319.1,250.5 348.1,230.8 348.1,230.8C348.1,230.8 311.1,178 311.1,178Z" fill="#f1e6cc"/><path d="M311.1,178C311.1,178 303,180.7 298.2,184C293.3,187.2 282.1,197.6 282.1,197.6C282.1,197.6 319.1,250.5 319.1,250.5C319.1,250.5 348.1,230.8 348.1,230.8C348.1,230.8 311.1,178 311.1,178Z" fill="none" stroke="#5a2318" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M311.1,178C311.1,178 315.9,171.2 320,168.1C324.1,165 335.9,159.4 335.9,159.4C335.9,159.4 372.6,211.8 372.6,211.8C372.6,211.8 348.1,230.8 348.1,230.8C348.1,230.8 311.1,178 311.1,178Z" fill="#e6d8b8"/><path d="M311.1,178C311.1,178 315.9,171.2 320,168.1C324.1,165 335.9,159.4 335.9,159.4C335.9,159.4 372.6,211.8 372.6,211.8C372.6,211.8 348.1,230.8 348.1,230.8C348.1,230.8 311.1,178 311.1,178Z" fill="none" stroke="#5a2318" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -402,7 +402,7 @@
 </g>
 <use href="#kv-thumb31" fill="none" stroke="#9a5a42" stroke-width="2" stroke-linejoin="round"/>
 </g></a>
-<g id="cat" role="button" tabindex="0" aria-label="Cat">
+<g id="cat" role="button" tabindex="0" aria-label="Cat" data-label="447 280" data-pop="pop-cat">
 <use href="#kv-cbody32" fill="#17191f"/>
 <g clip-path="url(#kv-cbody32c)">
 <use href="#kv-cbody32" fill="#3a4050" transform="translate(-3 -4)"/>
@@ -481,7 +481,7 @@
 <use href="#kv-ctail39" fill="none" stroke="#0e0f13" stroke-width="2.5" stroke-linejoin="round"/>
 </g>
 </g>
-<a id="link-camera" href="/photography/" aria-label="Photography">
+<a id="link-camera" href="/photography/" aria-label="Photography" data-label="822 330" data-pop="pop-photos">
 <g id="camera">
 <use href="#kv-knob40" fill="#9ca1aa"/>
 <g clip-path="url(#kv-knob40c)">

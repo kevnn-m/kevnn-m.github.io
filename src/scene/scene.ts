@@ -7,6 +7,7 @@ import { DAY, NIGHT, type ScenePalette } from './palette';
 import { Sky } from './sky';
 import { paintFar, paintMid, paintNear, ridge } from './hills';
 import { createGrass, type GrassColors } from './grass';
+import { Butterfly } from './butterfly';
 import { Flyers } from './flyers';
 import { Vignette } from './vignette';
 import { rng } from './wind';
@@ -90,10 +91,13 @@ export function mountScene(root: HTMLElement) {
   let front = createGrass($<HTMLCanvasElement>('.l-front'));
   const fxC = $<HTMLCanvasElement>('.l-fx');
   const flyers = new Flyers(fxC);
+  const fx = fxC.getContext('2d')!;
+  const butterfly = new Butterfly();
   const vig = new Vignette(root, vigHost, () => reduced.matches, TILT);
   const colors = (): GrassColors => ({ ramp: pal.grass, flowers: pal.flowers });
 
   let PX = 2;
+  let FW = 1; // the scene's width in art px
   let laidW = 0, laidH = 0; // the size the last layout was done for
   function layout() {
     const W = root.clientWidth, H = root.clientHeight;
@@ -142,7 +146,8 @@ export function mountScene(root: HTMLElement) {
     const slope = Math.tan((TILT * Math.PI) / 180);
     front.setBlades(frontBlades(AW, AH, (cx - vw * 0.55) / PX, (cx + vw * 0.55) / PX, (x) => (ground + (x * PX - cx) * slope) / PX, (vh * 0.035) / PX));
     // The effects layer covers the scene itself (no margin).
-    const FW = Math.ceil(W / PX), FH = Math.ceil(H / PX);
+    FW = Math.ceil(W / PX);
+    const FH = Math.ceil(H / PX);
     flyers.resize(FW, FH, PX);
     fit(fxC, FW, FH);
     flyers.night = pal.night;
@@ -181,8 +186,29 @@ export function mountScene(root: HTMLElement) {
     vig.animate(t);
     const src = running ? vig.paperSource() : null;
     flyers.update(t, dt, src && { ...src, x: src.x + planeShift.x, y: src.y + planeShift.y });
-    if (running) parallax(dt);
+    if (running) {
+      tourTick(dt);
+      butterfly.update(fx, dt, planeShift, pal.night);
+      parallax(dt);
+    }
   }
+
+  // The butterfly's tour, once per visit: it starts a moment after the
+  // drawing is ready, while the scene is on screen with motion allowed.
+  // Pressing anything in the scene sends it away. (?tour in the address
+  // shows it again.)
+  let tourWait = 1.2;
+  let toured = (() => {
+    try { return !new URLSearchParams(location.search).has('tour') && sessionStorage.getItem('scene-tour') === '1'; } catch { return false; }
+  })();
+  function tourTick(dt: number) {
+    if (toured || !vig.ready || (tourWait -= dt) > 0) return;
+    toured = true;
+    try { sessionStorage.setItem('scene-tour', '1'); } catch { /* it may show again next time */ }
+    const stops = vig.tourStops();
+    butterfly.start(stops, FW, (i) => vig.ping(stops[i].el), () => vig.ping(null));
+  }
+  for (const type of ['pointerdown', 'keydown']) root.addEventListener(type, () => butterfly.leave());
 
   // Animation loop: runs only while on screen, with motion allowed.
   // The clock starts at the still frame's time, so nothing jumps when motion starts.
