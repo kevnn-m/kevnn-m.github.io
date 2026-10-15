@@ -1,7 +1,8 @@
-// Hill layers, painted once per resize: far mountains, middle hills with
-// tree clumps, and the near field the grass grows on. Each layer is its own
-// canvas, so the scene can move them at different speeds (parallax).
+// Hill layers, painted per art pixel once per resize: far mountains, middle
+// hills with bushes, and the near hillside the grass grows on. Each layer is
+// its own canvas, so the scene can move them at different speeds (parallax).
 import type { ScenePalette } from './palette';
+import { bayer, fbm, noise2, pick, pixelCanvas, put, type Ramp } from './pixel';
 import { rng } from './wind';
 
 export type Ridge = (x: number) => number;
@@ -19,129 +20,111 @@ const RIDGES = {
   near: (u: number) => 0.34 + 0.38 * u ** 1.25 + 0.015 * Math.sin(u * 8 + 0.5),
 };
 
-export const ridge = (kind: keyof typeof RIDGES, W: number, H: number): Ridge => (x) => RIDGES[kind](x / W) * H;
+export const ridge = (kind: keyof typeof RIDGES, W: number, H: number): Ridge => (x) =>
+  RIDGES[kind](Math.min(1, Math.max(0, x / W))) * H;
 
-function setup(canvas: HTMLCanvasElement, W: number, H: number, dpr: number) {
-  canvas.width = Math.round(W * dpr);
-  canvas.height = Math.round(H * dpr);
-  const ctx = canvas.getContext('2d')!;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, W, H);
-  return ctx;
+// Sunlight from the upper left.
+const L = (() => { const v = [-0.5, -0.7, 0.5]; const n = Math.hypot(...v); return v.map((c) => c / n); })();
+
+interface HillStyle {
+  ramp: Ramp;
+  seed: number;
+  top: number; // value at the crest
+  fall: number; // how much darker it gets going down
+  fallDepth: number; // over how many px (fraction of H)
+  texture: number; // strength of the brush-mass noise
+  scale: number; // size of the brush masses (smaller = bigger patches)
+  stretch: number; // how much the strokes are drawn out sideways
 }
 
-function hillPath(ctx: CanvasRenderingContext2D, top: Ridge, W: number, H: number) {
-  ctx.beginPath();
-  ctx.moveTo(-10, H + 10);
-  for (let x = -10; x <= W + 10; x += 6) ctx.lineTo(x, top(x));
-  ctx.lineTo(W + 10, H + 10);
-  ctx.closePath();
+/** Base shading of a hill: crest light, darker going down, painted patches, lit slopes. */
+function paintHill(img: ImageData, top: Ridge, W: number, H: number, s: HillStyle) {
+  const n = noise2(s.seed);
+  for (let x = 0; x < W; x++) {
+    const t0 = Math.max(0, Math.ceil(top(x)));
+    const slope = top(x + 1) - top(x - 1); // < 0 where the ground rises to the right (faces the sun)
+    for (let y = t0; y < H; y++) {
+      const depth = Math.min(1, (y - top(x)) / (H * s.fallDepth));
+      let v = s.top - depth * s.fall;
+      v += (fbm(n, x * s.scale, y * s.scale * s.stretch, 3) - 0.5) * s.texture;
+      v -= slope * 0.08;
+      if (y - top(x) < 1.5) v += 0.25; // rim light on the crest
+      put(img, x, y, pick(s.ramp, v, x, y));
+    }
+  }
 }
 
-/** Fill a hill with a vertical gradient and short brush strokes for texture. */
-function paintHill(ctx: CanvasRenderingContext2D, top: Ridge, W: number, H: number, colors: [string, string], seed: number, strokes: number, strength = 0.1) {
-  let minY = H;
-  for (let x = 0; x <= W; x += 20) minY = Math.min(minY, top(x));
-  hillPath(ctx, top, W, H);
-  const g = ctx.createLinearGradient(0, minY, 0, H);
-  g.addColorStop(0, colors[0]);
-  g.addColorStop(1, colors[1]);
-  ctx.fillStyle = g;
-  ctx.fill();
-
-  ctx.save();
-  hillPath(ctx, top, W, H);
-  ctx.clip();
+/** A cluster of lit spheres: a bush (or, flattened, a rock). */
+function blobs(img: ImageData, cx: number, cy: number, size: number, rmp: Ramp, seed: number, flat = 1) {
   const r = rng(seed);
-  ctx.lineCap = 'round';
-  for (let i = 0; i < strokes; i++) {
-    const x = r() * W;
-    const y = top(x) + r() * (H - top(x));
-    const slope = (top(x + 4) - top(x - 4)) / 8;
-    const len = 5 + r() * 14;
-    ctx.strokeStyle = r() < 0.5 ? `rgba(255, 255, 230, ${strength})` : `rgba(10, 30, 10, ${strength})`;
-    ctx.lineWidth = 1 + r() * 2.5;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.quadraticCurveTo(x + len * 0.5, y + slope * len * 0.5 - 2, x + len, y + slope * len);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-function clump(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, pal: ScenePalette, r: () => number) {
-  const n = 5 + Math.floor(r() * 5);
-  const blobs = Array.from({ length: n }, () => ({
-    dx: (r() - 0.5) * size * 1.6, dy: -r() * size * 0.7, rad: size * (0.35 + r() * 0.35),
+  const n = noise2(seed);
+  const parts = Array.from({ length: 4 + Math.floor(r() * 4) }, () => ({
+    x: cx + (r() - 0.5) * size * 1.5, y: cy - r() * size * 0.6 * flat, r: size * (0.38 + r() * 0.3),
   }));
-  ctx.fillStyle = pal.tree[0];
-  for (const b of blobs) { ctx.beginPath(); ctx.arc(x + b.dx, y + b.dy, b.rad, 0, Math.PI * 2); ctx.fill(); }
-  ctx.fillStyle = pal.tree[1];
-  for (const b of blobs) {
-    ctx.beginPath();
-    ctx.arc(x + b.dx - b.rad * 0.25, y + b.dy - b.rad * 0.3, b.rad * 0.6, 0, Math.PI * 2);
-    ctx.fill();
+  const x0 = Math.floor(cx - size * 1.6), x1 = Math.ceil(cx + size * 1.6);
+  const y0 = Math.floor(cy - size * 1.5), y1 = Math.ceil(cy + size * 0.6);
+  for (let y = Math.max(0, y0); y <= Math.min(img.height - 1, y1); y++) {
+    for (let x = Math.max(0, x0); x <= Math.min(img.width - 1, x1); x++) {
+      let best = -1, nx = 0, ny = 0, nz = 0, bd = 2;
+      const wob = (n(x * 0.5, y * 0.5) - 0.5) * 0.35; // leafy, uneven edge
+      for (const p of parts) {
+        const dx = (x - p.x) / p.r, dy = (y - p.y) / (p.r * flat);
+        const d = Math.hypot(dx, dy) + wob;
+        if (d < 1) {
+          const h = Math.sqrt(1 - Math.min(1, dx * dx + dy * dy));
+          if (h > best) { best = h; nx = dx; ny = dy; nz = h; bd = d; }
+        }
+      }
+      if (best < 0) continue;
+      if (bd > 0.85 && bayer(x, y) < (bd - 0.85) / 0.15) continue;
+      const lam = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]);
+      const v = 0.08 + 0.85 * lam + (n(x * 0.9, y * 0.9) - 0.5) * 0.25;
+      put(img, x, y, pick(rmp, v, x, y));
+    }
   }
 }
 
-function rock(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, pal: ScenePalette) {
-  ctx.fillStyle = pal.rock[0];
-  ctx.beginPath();
-  ctx.ellipse(x, y, w, w * 0.55, 0, Math.PI, 0);
-  ctx.fill();
-  ctx.fillStyle = pal.rock[1];
-  ctx.beginPath();
-  ctx.ellipse(x - w * 0.2, y - w * 0.25, w * 0.6, w * 0.25, -0.15, 0, Math.PI * 2);
-  ctx.fill();
+function finish(canvas: HTMLCanvasElement, img: ImageData) {
+  canvas.width = img.width;
+  canvas.height = img.height;
+  canvas.getContext('2d')!.putImageData(img, 0, 0);
 }
 
-export function paintFar(canvas: HTMLCanvasElement, W: number, H: number, dpr: number, pal: ScenePalette) {
-  const ctx = setup(canvas, W, H, dpr);
+/** Sizes are in art pixels. */
+export function paintFar(canvas: HTMLCanvasElement, W: number, H: number, pal: ScenePalette) {
+  const { img } = pixelCanvas(W, H);
   const top = ridge('far', W, H);
-  paintHill(ctx, top, W, H, pal.far, 3, (W * H) / 900, 0.035);
-  // Mist at the foot of the mountains.
-  const mist = ctx.createLinearGradient(0, H * 0.5, 0, H * 0.66);
-  mist.addColorStop(0, 'rgba(0,0,0,0)');
-  mist.addColorStop(1, pal.haze);
-  ctx.fillStyle = mist;
-  ctx.fillRect(0, H * 0.5, W, H * 0.5);
+  // Haze: the lower slopes fade toward the sky (lighter), like distant air.
+  paintHill(img, top, W, H, { ramp: pal.far, seed: 3, top: 0.75, fall: -0.35, fallDepth: 0.3, texture: 0.25, scale: 0.03, stretch: 2.2 });
+  finish(canvas, img);
 }
 
-export function paintMid(canvas: HTMLCanvasElement, W: number, H: number, dpr: number, pal: ScenePalette) {
-  const ctx = setup(canvas, W, H, dpr);
+export function paintMid(canvas: HTMLCanvasElement, W: number, H: number, pal: ScenePalette) {
+  const { img } = pixelCanvas(W, H);
   const top = ridge('mid', W, H);
-  paintHill(ctx, top, W, H, pal.mid, 5, (W * H) / 500, 0.07);
+  paintHill(img, top, W, H, { ramp: pal.mid, seed: 5, top: 0.85, fall: 0.5, fallDepth: 0.35, texture: 0.45, scale: 0.035, stretch: 2.5 });
   const r = rng(21);
-  const size = Math.max(8, H * 0.025);
-  for (let i = 0; i < Math.round(W / 110); i++) {
+  const size = Math.max(3, H * 0.022);
+  for (let i = 0; i < Math.round(W / 40); i++) {
     const x = r() * W;
-    clump(ctx, x, top(x) + size * (1 + r() * 3), size * (0.8 + r() * 0.8), pal, r);
+    blobs(img, x, top(x) + size * (1.2 + r() * 3), size * (0.8 + r() * 0.8), pal.bush, 40 + i);
   }
-  for (let i = 0; i < Math.round(W / 160); i++) {
+  for (let i = 0; i < Math.round(W / 60); i++) {
     const x = r() * W;
-    rock(ctx, x, top(x) + size * (2 + r() * 4), size * (0.4 + r() * 0.3), pal);
+    blobs(img, x, top(x) + size * (2 + r() * 4), size * (0.35 + r() * 0.25), pal.rock, 90 + i, 0.6);
   }
+  finish(canvas, img);
 }
 
-export function paintNear(canvas: HTMLCanvasElement, W: number, H: number, dpr: number, pal: ScenePalette) {
-  const ctx = setup(canvas, W, H, dpr);
+export function paintNear(canvas: HTMLCanvasElement, W: number, H: number, pal: ScenePalette) {
+  const { img } = pixelCanvas(W, H);
   const top = ridge('near', W, H);
-  paintHill(ctx, top, W, H, pal.near, 7, (W * H) / 300);
-  // Sunlight catching the crest.
-  ctx.save();
-  hillPath(ctx, top, W, H);
-  ctx.clip();
-  ctx.beginPath();
-  for (let x = -10; x <= W + 10; x += 6) ctx.lineTo(x, top(x) + 3);
-  ctx.strokeStyle = pal.night ? 'rgba(160, 190, 230, 0.12)' : 'rgba(255, 250, 210, 0.35)';
-  ctx.lineWidth = 8;
-  ctx.stroke();
-  ctx.restore();
-  // Bushes on the slope, like the reference paintings.
+  paintHill(img, top, W, H, { ramp: pal.near, seed: 7, top: 0.95, fall: 0.65, fallDepth: 0.55, texture: 0.5, scale: 0.025, stretch: 1.8 });
   const r = rng(31);
-  const size = Math.max(10, H * 0.03);
+  const size = Math.max(4, H * 0.03);
   for (const u of [0.05, 0.3, 0.62, 0.9]) {
     const x = W * u;
-    clump(ctx, x, top(x) + size * (1.2 + r() * 1.5), size * (0.9 + r() * 0.6), pal, r);
+    blobs(img, x, top(x) + size * (1.4 + r() * 1.5), size * (0.9 + r() * 0.6), pal.bush, 60 + Math.round(u * 10));
   }
+  finish(canvas, img);
 }

@@ -44,14 +44,15 @@ const svg = vignetteSvg.replace('aria-label="Cat"', `aria-label="${catName}"`);
   @media (prefers-color-scheme: dark) {
     .scene { background: linear-gradient(160deg, #081130, #24406e 45%, #24492c 45%, #16321d); }
   }
-  /* Layers are 20px larger than the scene on each side (room for parallax; see MARGIN in scene.ts). */
+  /* Layers are 21px larger than the scene on each side (room for parallax; see MARGIN in scene.ts). */
   .layer {
-    position: absolute; top: -20px; left: -20px;
-    width: calc(100% + 40px); height: calc(100% + 40px);
+    position: absolute; top: -21px; left: -21px;
+    width: calc(100% + 42px); height: calc(100% + 42px);
     will-change: transform;
   }
-  .l-plane > canvas, .l-fx { position: absolute; inset: 0; width: 100%; height: 100%; }
-  canvas { display: block; pointer-events: none; }
+  /* The script sets each canvas to an exact multiple of the art-pixel size. */
+  .l-plane > canvas, .l-fx { position: absolute; top: 0; left: 0; }
+  canvas { display: block; pointer-events: none; image-rendering: pixelated; image-rendering: crisp-edges; }
 
   /* The script sets the exact place and size; this is the spot before it runs. */
   .vignette { position: absolute; left: 20%; bottom: 8%; width: 56%; pointer-events: none; transform-origin: 50% 92%; }
@@ -65,15 +66,16 @@ const svg = vignetteSvg.replace('aria-label="Cat"', `aria-label="${catName}"`);
     .vignette :global(svg) { filter: brightness(0.6) saturate(0.85); }
   }
 
+  /* Labels and popups in a pixel-game style, to match the art. */
   .scene-label, .cat-bubble, .cat-pop {
     position: absolute; z-index: 5; transform: translate(-50%, -100%);
-    font: 600 0.85rem/1.3 var(--font-sans); color: #2b2420;
-    background: #fffdf4; border: 1.5px solid #3b2a20; border-radius: 10px;
-    box-shadow: 0 3px 10px rgb(0 0 0 / 0.18);
+    font: 600 0.8rem/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; color: #2b2420;
+    background: #fffdf2; border: 3px solid #2b2420; border-radius: 0;
+    box-shadow: 3px 3px 0 #2b2420;
   }
-  .scene-label { padding: 4px 10px; pointer-events: none; white-space: nowrap; }
-  .cat-bubble { padding: 6px 12px; font-style: italic; border-radius: 16px; }
-  .cat-pop { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 14px; white-space: nowrap; }
+  .scene-label { padding: 3px 8px; pointer-events: none; white-space: nowrap; }
+  .cat-bubble { padding: 4px 10px; font-style: italic; }
+  .cat-pop { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 12px; white-space: nowrap; }
   .cat-pop a { color: #2f5fa7; text-decoration: underline; text-underline-offset: 3px; }
   .cat-close {
     border: 0; background: none; font-size: 1.2rem; line-height: 1; cursor: pointer;

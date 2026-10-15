@@ -45,15 +45,38 @@ export class Vignette {
   private flickStart = -1;
   private now = 0;
   private bubbleTimer = 0;
-  private paper: { x: number; y: number; scale: number } | null = null;
+  private paper: { x: number; y: number; size: number } | null = null;
+  private pixelate: SVGFilterElement | null = null;
 
-  constructor(private root: HTMLElement, host: HTMLElement, private reduced: () => boolean) {
+  constructor(private root: HTMLElement, host: HTMLElement, private reduced: () => boolean, tilt: number) {
     this.svg = host.querySelector('svg');
     this.label = root.querySelector('.scene-label')!;
     this.bubble = root.querySelector('.cat-bubble')!;
     this.pop = root.querySelector('.cat-pop')!;
     if (!this.svg) return;
     const svg = this.svg;
+
+    // Pixelate the whole drawing to match the scene, and tilt it to lie along
+    // the hillside. The tilt is inside the filter, so the pixel grid stays
+    // level with the screen.
+    const defs = (svg.querySelector('defs') ?? svg.insertBefore(document.createElementNS(SVGNS, 'defs'), svg.firstChild)) as SVGDefsElement;
+    defs.insertAdjacentHTML('beforeend', `
+      <filter id="vg-pixelate" x="-100" y="-100" width="1200" height="620" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feFlood flood-color="#000" result="dot"/>
+        <feComposite in="dot" in2="dot" operator="over" result="cell"/>
+        <feTile in="cell" result="grid"/>
+        <feComposite in="SourceGraphic" in2="grid" operator="in" result="points"/>
+        <feMorphology in="points" operator="dilate"/>
+      </filter>`);
+    this.pixelate = defs.querySelector<SVGFilterElement>('#vg-pixelate');
+    const outer = document.createElementNS(SVGNS, 'g');
+    const turn = document.createElementNS(SVGNS, 'g');
+    outer.setAttribute('filter', 'url(#vg-pixelate)');
+    turn.setAttribute('transform', `rotate(${tilt} 500 385)`);
+    for (const node of [...svg.childNodes]) if (node !== defs) turn.appendChild(node);
+    outer.appendChild(turn);
+    svg.appendChild(outer);
+
     this.hair = part(svg, 'hair', 'center');
     this.page = part(svg, 'book-page', 'bottom-left');
     this.sheets = part(svg, 'papers-top', 'bottom-left');
@@ -131,10 +154,31 @@ export class Vignette {
   }
 
   /**
+   * Set the pixel block size, in SVG units (one art pixel on screen).
+   * Each block shows the color sampled near its middle.
+   */
+  setPixelSize(units: number) {
+    const f = this.pixelate;
+    if (!f) return;
+    const dot = units * 0.4;
+    const [flood, cell, , , grow] = [...f.children] as SVGElement[];
+    flood.setAttribute('x', String(units * 0.3));
+    flood.setAttribute('y', String(units * 0.3));
+    flood.setAttribute('width', String(dot));
+    flood.setAttribute('height', String(dot));
+    cell.setAttribute('x', '0');
+    cell.setAttribute('y', '0');
+    cell.setAttribute('width', String(units));
+    cell.setAttribute('height', String(units));
+    grow.setAttribute('radius', String(units * 0.3));
+  }
+
+  /**
    * Measure part positions once per resize (reading them every frame would be slow).
    * @param offset shift from scene px to the grass layer's px, so gusts line up
+   * @param px screen px per art px (the effects layer is in art px)
    */
-  layout(offset: number) {
+  layout(offset: number, px: number) {
     for (const p of [this.hair, this.page, this.sheets, this.tail]) {
       if (!p) continue;
       const r = this.rectIn(p.el);
@@ -143,7 +187,7 @@ export class Vignette {
     }
     if (this.sheets) {
       const r = this.rectIn(this.sheets.el);
-      this.paper = { x: r.x + r.w * 0.6, y: r.y + r.h * 0.3, scale: Math.max(0.8, r.w / 60) };
+      this.paper = { x: (r.x + r.w * 0.6) / px, y: (r.y + r.h * 0.3) / px, size: Math.max(1, Math.min(2, r.w / px / 30)) };
     }
   }
 

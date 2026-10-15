@@ -1,22 +1,25 @@
-// Grass blades drawn with WebGL2 (one draw call, one instance per blade).
-// Each blade bends with the shared wind model and turns lighter where a gust
-// passes, so you can see waves of wind roll across the field.
-// Without WebGL2 the blades are drawn once with Canvas 2D (a still image).
-import type { RGB } from './palette';
+// Grass blades drawn with WebGL2 (one draw call, one instance per blade) on a
+// low-resolution canvas, so every blade is made of chunky art pixels. Colors
+// are snapped to the grass ramp with ordered dithering. Each blade bends with
+// the shared wind and turns lighter where a gust passes, so waves of wind roll
+// across the hill. Without WebGL2 the blades are drawn once with Canvas 2D.
+import type { Ramp } from './pixel';
 import { GUST_GLSL, gust } from './wind';
 
-/** Per blade: root x, root y (CSS px), height, width, seed 0..1, depth 0..1 (far..near). */
+/** Per blade, in art px: root x, root y, height, width, seed 0..1, depth 0..1 (far..near). */
 export const BLADE_FLOATS = 6;
 
-const SEGMENTS = 6;
+const SEGMENTS = 5;
+const MAX_RAMP = 8;
 
 const VERT = /* glsl */ `#version 300 es
 in vec2 aPos;    // x: -1..1 across the blade, y: 0..1 along it
-in vec4 aRoot;   // x, y, height, width
+in vec4 aRoot;   // x, y, height, width (art px)
 in vec2 aSeed;   // seed, depth
 uniform vec2 uRes;
 uniform float uTime;
 uniform float uGust;
+uniform float uPx;   // CSS px per art px (the wind is defined in CSS px)
 out float vT;
 out float vGust;
 out float vSeed;
@@ -25,12 +28,12 @@ ${GUST_GLSL}
 void main() {
   float t = aPos.y;
   float seed = aSeed.x;
-  float g = gust(aRoot.xy, uTime);
-  float sway = sin(uTime * 1.3 + aRoot.x * 0.012 + seed * 6.283) * 0.16
+  float g = gust(aRoot.xy * uPx, uTime);
+  float sway = sin(uTime * 1.3 + aRoot.x * uPx * 0.012 + seed * 6.283) * 0.16
              + sin(uTime * 2.3 + seed * 12.0) * 0.05;
-  float bend = 0.18 + (seed - 0.5) * 0.5 + sway + g * uGust;
+  float bend = 0.2 + (seed - 0.5) * 0.5 + sway + g * uGust;
   float h = aRoot.z;
-  float x = aRoot.x + bend * h * pow(t, 1.7) * 0.7 + aPos.x * aRoot.w * 0.5 * (1.0 - t * 0.94);
+  float x = aRoot.x + bend * h * pow(t, 1.7) * 0.7 + aPos.x * aRoot.w * 0.5 * (1.0 - t * 0.85);
   float y = aRoot.y - h * t * (1.0 - 0.2 * bend * bend * t);
   gl_Position = vec4(x / uRes.x * 2.0 - 1.0, 1.0 - y / uRes.y * 2.0, 0.0, 1.0);
   vT = t; vGust = g; vSeed = seed; vDepth = aSeed.y;
@@ -42,27 +45,46 @@ in float vT;
 in float vGust;
 in float vSeed;
 in float vDepth;
-uniform vec3 uBase;
-uniform vec3 uTip;
-uniform vec3 uGustColor;
-uniform vec3 uFar;
+uniform vec3 uRamp[${MAX_RAMP}];
+uniform int uRampN;
+uniform vec3 uFlowers[3];
 out vec4 outColor;
+float bayer4(vec2 p) {
+  const float m[16] = float[16](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
+  ivec2 q = ivec2(mod(p, 4.0));
+  return (m[q.y * 4 + q.x] + 0.5) / 16.0;
+}
 void main() {
-  vec3 c = mix(uBase, uTip, smoothstep(0.0, 1.0, vT));
-  c *= 0.82 + 0.32 * vSeed;
-  c = mix(c, uGustColor, vGust * vT * 0.6);
-  c = mix(c, uFar, (1.0 - vDepth) * 0.45);
-  outColor = vec4(c, 1.0);
+  // A few blades carry a small flower at the tip.
+  if (vSeed > 0.986 && vT > 0.78) {
+    outColor = vec4(uFlowers[int(mod(vSeed * 1000.0, 3.0))], 1.0);
+    return;
+  }
+  float v = mix(0.08, 0.78, vT) + (vSeed - 0.5) * 0.22 + vGust * vT * 0.5;
+  v = mix(v, 0.62 + vT * 0.25, (1.0 - vDepth) * 0.55); // far grass is lighter, flatter
+  float n = float(uRampN - 1);
+  int i = int(clamp(floor(v * n + bayer4(gl_FragCoord.xy)), 0.0, n));
+  outColor = vec4(uRamp[i], 1.0);
 }`;
 
-export interface GrassColors { base: RGB; tip: RGB; gust: RGB; far: RGB }
+export interface GrassColors { ramp: Ramp; flowers: Ramp }
 
 export interface GrassRenderer {
   readonly webgl: boolean;
   setBlades(data: Float32Array): void;
-  resize(W: number, H: number, dpr: number): void;
+  /** W, H in art px; px = CSS px per art px. */
+  resize(W: number, H: number, px: number): void;
   draw(t: number, colors: GrassColors, gustStrength: number): void;
 }
+
+const flat = (r: Ramp, n: number) => {
+  const out = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const c = r[Math.min(i, r.length - 1)];
+    out.set([c[0] / 255, c[1] / 255, c[2] / 255], i * 3);
+  }
+  return out;
+};
 
 function compile(gl: WebGL2RenderingContext, type: number, src: string) {
   const s = gl.createShader(type)!;
@@ -81,6 +103,7 @@ class WebGLGrass implements GrassRenderer {
   private u: Record<string, WebGLUniformLocation | null> = {};
   private W = 1;
   private H = 1;
+  private px = 1;
 
   constructor(private canvas: HTMLCanvasElement, private gl: WebGL2RenderingContext) {
     const prog = (this.prog = gl.createProgram()!);
@@ -88,11 +111,10 @@ class WebGLGrass implements GrassRenderer {
     gl.attachShader(prog, compile(gl, gl.FRAGMENT_SHADER, FRAG));
     gl.linkProgram(prog);
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog) ?? 'link error');
-    for (const n of ['uRes', 'uTime', 'uGust', 'uBase', 'uTip', 'uGustColor', 'uFar']) this.u[n] = gl.getUniformLocation(prog, n);
+    for (const n of ['uRes', 'uTime', 'uGust', 'uPx', 'uRamp', 'uRampN', 'uFlowers']) this.u[n] = gl.getUniformLocation(prog, n);
 
     this.vao = gl.createVertexArray()!;
     gl.bindVertexArray(this.vao);
-    // One blade: a triangle strip, two vertices per row.
     const shape: number[] = [];
     for (let i = 0; i <= SEGMENTS; i++) shape.push(-1, i / SEGMENTS, 1, i / SEGMENTS);
     const sb = gl.createBuffer();
@@ -123,12 +145,11 @@ class WebGLGrass implements GrassRenderer {
     this.count = data.length / BLADE_FLOATS;
   }
 
-  resize(W: number, H: number, dpr: number) {
-    this.W = W;
-    this.H = H;
-    this.canvas.width = Math.round(W * dpr);
-    this.canvas.height = Math.round(H * dpr);
-    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+  resize(W: number, H: number, px: number) {
+    Object.assign(this, { W, H, px });
+    this.canvas.width = W;
+    this.canvas.height = H;
+    this.gl.viewport(0, 0, W, H);
   }
 
   draw(t: number, c: GrassColors, gustStrength: number) {
@@ -139,45 +160,43 @@ class WebGLGrass implements GrassRenderer {
     gl.uniform2f(u.uRes, this.W, this.H);
     gl.uniform1f(u.uTime, t);
     gl.uniform1f(u.uGust, gustStrength);
-    gl.uniform3fv(u.uBase, c.base);
-    gl.uniform3fv(u.uTip, c.tip);
-    gl.uniform3fv(u.uGustColor, c.gust);
-    gl.uniform3fv(u.uFar, c.far);
+    gl.uniform1f(u.uPx, this.px);
+    gl.uniform3fv(u.uRamp, flat(c.ramp, MAX_RAMP));
+    gl.uniform1i(u.uRampN, Math.min(MAX_RAMP, c.ramp.length));
+    gl.uniform3fv(u.uFlowers, flat(c.flowers, 3));
     gl.bindVertexArray(this.vao);
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, (SEGMENTS + 1) * 2, this.count);
     gl.bindVertexArray(null);
   }
 }
 
-/** Fallback: the same blades as simple 2D strokes. */
+/** Fallback: the same blades as simple 2D strokes, drawn once. */
 class CanvasGrass implements GrassRenderer {
   readonly webgl = false;
   private data: Float32Array = new Float32Array(0);
   private ctx: CanvasRenderingContext2D;
   private W = 1;
   private H = 1;
-  private dpr = 1;
+  private px = 1;
   constructor(private canvas: HTMLCanvasElement) {
     this.ctx = canvas.getContext('2d')!;
   }
   setBlades(data: Float32Array) { this.data = data; }
-  resize(W: number, H: number, dpr: number) {
-    Object.assign(this, { W, H, dpr });
-    this.canvas.width = Math.round(W * dpr);
-    this.canvas.height = Math.round(H * dpr);
+  resize(W: number, H: number, px: number) {
+    Object.assign(this, { W, H, px });
+    this.canvas.width = W;
+    this.canvas.height = H;
   }
   draw(t: number, c: GrassColors, gustStrength: number) {
     const { ctx, data } = this;
-    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, this.W, this.H);
-    const lerp = (a: RGB, b: RGB, k: number): RGB => [0, 1, 2].map((i) => a[i] + (b[i] - a[i]) * k) as RGB;
-    ctx.lineCap = 'round';
+    ctx.lineCap = 'butt';
     for (let i = 0; i < data.length; i += BLADE_FLOATS) {
       const [x, y, h, w, seed, depth] = data.subarray(i, i + BLADE_FLOATS);
-      const bend = 0.18 + (seed - 0.5) * 0.5 + gust(x, y, t) * gustStrength;
-      const col = lerp(lerp(c.base, c.tip, 0.6), c.far, (1 - depth) * 0.45);
-      ctx.strokeStyle = `rgb(${col.map((v) => Math.round(v * 255)).join(',')})`;
-      ctx.lineWidth = w * 0.7;
+      const bend = 0.2 + (seed - 0.5) * 0.5 + gust(x * this.px, y * this.px, t) * gustStrength;
+      const col = c.ramp[Math.min(c.ramp.length - 1, Math.round((0.35 + seed * 0.3 + (1 - depth) * 0.2) * (c.ramp.length - 1)))];
+      ctx.strokeStyle = `rgb(${col})`;
+      ctx.lineWidth = Math.max(1, w * 0.7);
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.quadraticCurveTo(x, y - h * 0.6, x + bend * h * 0.7, y - h);
@@ -187,7 +206,7 @@ class CanvasGrass implements GrassRenderer {
 }
 
 export function createGrass(canvas: HTMLCanvasElement): GrassRenderer {
-  const gl = canvas.getContext('webgl2', { alpha: true, antialias: true, premultipliedAlpha: true });
+  const gl = canvas.getContext('webgl2', { alpha: true, antialias: false, premultipliedAlpha: true });
   if (!gl) return new CanvasGrass(canvas);
   try {
     return new WebGLGrass(canvas, gl);

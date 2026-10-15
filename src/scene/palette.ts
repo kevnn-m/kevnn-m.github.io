@@ -1,68 +1,43 @@
-// Scene colors for day and night. PLACEHOLDER values: change freely.
-
-export type RGB = [number, number, number];
+// Scene colors for day and night, as ramps from dark to light.
+// Each material is shaded with only the colors in its ramp (plus dithering),
+// so changing a ramp changes the whole look. PLACEHOLDER values: tune freely.
+import { ramp, type Ramp } from './pixel';
 
 export interface ScenePalette {
   night: boolean;
-  skyTop: string;
-  skyHorizon: string;
-  sunGlow: string; // '' for none
-  cloudLight: string;
-  cloudShadow: string;
-  cloudAlpha: number;
-  far: [string, string]; // top, base
-  mid: [string, string];
-  near: [string, string];
-  haze: string; // mist at the foot of the far hills
-  tree: [string, string]; // shadow, light
-  rock: [string, string];
-  grassBase: RGB;
-  grassTip: RGB;
-  grassGust: RGB; // color where the wind bends the grass
-  grassFar: RGB; // distant grass fades toward this
+  sky: Ramp; // top of the sky (index 0) to the horizon
+  cloud: Ramp; // shadow to highlight
+  far: Ramp;
+  mid: Ramp;
+  near: Ramp; // the ground of our hillside, under the grass
+  bush: Ramp;
+  rock: Ramp;
+  grass: Ramp; // blade base to tip; the lightest colors show where the wind bends it
+  flowers: Ramp;
 }
-
-const hex = (h: string): RGB => {
-  const n = parseInt(h.slice(1), 16);
-  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
-};
 
 export const DAY: ScenePalette = {
   night: false,
-  skyTop: '#2f7fd6',
-  skyHorizon: '#d4ecf7',
-  sunGlow: 'rgba(255, 248, 220, 0.55)',
-  cloudLight: '#ffffff',
-  cloudShadow: '#b7cbe2',
-  cloudAlpha: 1,
-  far: ['#8bb6c9', '#6f9fb2'],
-  mid: ['#6fae5a', '#3f7d43'],
-  near: ['#9ccd5c', '#5c9636'],
-  haze: 'rgba(225, 240, 245, 0.55)',
-  tree: ['#2e5a2c', '#5a9445'],
-  rock: ['#8d8f86', '#c9c8bb'],
-  grassBase: hex('#2f6524'),
-  grassTip: hex('#a6d65e'),
-  grassGust: hex('#e2f29a'),
-  grassFar: hex('#8fc25a'),
+  sky: ramp('#2462c4', '#2f78d8', '#4a91e2', '#6dabeb', '#95c6f1', '#bfdcf4', '#e2f1f6'),
+  cloud: ramp('#8592c4', '#a3b2d8', '#c6d3eb', '#e7eef7', '#ffffff', '#fffbe9'),
+  far: ramp('#58829f', '#6894ae', '#7ba6bd', '#91b8ca', '#acccd7'),
+  mid: ramp('#2c6638', '#3a7a3f', '#4d9046', '#66a64e', '#84bc5b', '#a6d26b'),
+  near: ramp('#3b772b', '#4c8c32', '#61a23a', '#7ab844', '#97cb55', '#badc70', '#d9ea96'),
+  bush: ramp('#1d4724', '#295c2b', '#387332', '#4f8d3c', '#6ca748', '#8cc05a'),
+  rock: ramp('#66665f', '#84837a', '#a3a295', '#c4c3b4', '#dddccd'),
+  grass: ramp('#22501d', '#2d6425', '#3c7c2b', '#519434', '#6cac3e', '#8cc34c', '#b1d965', '#d5ec90'),
+  flowers: ramp('#ffffff', '#fff1a3', '#f6b8c6'),
 };
 
 export const NIGHT: ScenePalette = {
   night: true,
-  skyTop: '#081130',
-  skyHorizon: '#24406e',
-  sunGlow: '',
-  cloudLight: '#5a6a92',
-  cloudShadow: '#2b3758',
-  cloudAlpha: 0.8,
-  far: ['#24405e', '#1d3550'],
-  mid: ['#1d3d2c', '#132a1f'],
-  near: ['#24492c', '#16321d'],
-  haze: 'rgba(70, 95, 140, 0.35)',
-  tree: ['#0d1f16', '#1f3d29'],
-  rock: ['#3a4250', '#5c6678'],
-  grassBase: hex('#0c2214'),
-  grassTip: hex('#2d5a3c'),
-  grassGust: hex('#56786f'),
-  grassFar: hex('#1f4030'),
+  sky: ramp('#050a1d', '#08112b', '#0c1837', '#122246', '#192d56', '#223a67', '#2d4875'),
+  cloud: ramp('#161e3b', '#212b52', '#2e3a64', '#3f4c77', '#55638d', '#6d7ca4'),
+  far: ramp('#122138', '#182a44', '#1f344f', '#283f5b'),
+  mid: ramp('#0b1d16', '#10261b', '#163021', '#1d3b29', '#254731'),
+  near: ramp('#0e2418', '#132d1d', '#183723', '#1f422a', '#284f32', '#335c3b'),
+  bush: ramp('#06120c', '#0b1b12', '#112518', '#183020'),
+  rock: ramp('#232a35', '#2f3744', '#3e4756', '#525c6c'),
+  grass: ramp('#07180f', '#0c2215', '#122c1b', '#183722', '#20442a', '#2a5234', '#3a6646', '#58866c'),
+  flowers: ramp('#9fb0c8', '#b9b48a', '#a68f9f'),
 };
