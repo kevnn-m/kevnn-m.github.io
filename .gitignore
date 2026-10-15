@@ -12,3 +12,6 @@ npm-debug.log*
 
 # OS
 .DS_Store
+
+# drafts made while drawing the scene illustration
+src/scene/art/vignette-*.svg
