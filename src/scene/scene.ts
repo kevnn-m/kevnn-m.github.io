@@ -51,8 +51,8 @@ function frontBlades(W: number, H: number, x0: number, x1: number, groundAt: (x:
   const r = rng(81);
   const top = ridge('near', W, H);
   const rows: number[][] = [];
-  const band = H * 0.04;
-  for (let i = 0; i < Math.round((x1 - x0) * 1.2); i++) {
+  const band = H * 0.025;
+  for (let i = 0; i < Math.round((x1 - x0) * 0.8); i++) {
     const x = x0 + r() * (x1 - x0);
     const g = groundAt(x);
     const y = g + 1 + r() * band;
@@ -111,7 +111,7 @@ export function mountScene(root: HTMLElement) {
     // pixel grids line up.
     const snap = (v: number) => Math.round(v / PX) * PX;
     const narrow = PW < 700;
-    const vw = snap(Math.min(PW * (narrow ? 0.84 : 0.4), PH * 1.3));
+    const vw = snap(Math.min(PW * (narrow ? 0.88 : 0.43), PH * 1.4));
     const vh = vw * 0.42;
     const ground = PH * (narrow ? 0.8 : 0.76);
     const cx = PW * (narrow ? 0.5 : 0.42);
@@ -127,7 +127,7 @@ export function mountScene(root: HTMLElement) {
     field.setBlades(fieldBlades(AW, AH));
     front.resize(AW, AH, PX);
     const slope = Math.tan((TILT * Math.PI) / 180);
-    front.setBlades(frontBlades(AW, AH, (cx - vw * 0.55) / PX, (cx + vw * 0.55) / PX, (x) => (ground + (x * PX - cx) * slope) / PX, (vh * 0.1) / PX));
+    front.setBlades(frontBlades(AW, AH, (cx - vw * 0.55) / PX, (cx + vw * 0.55) / PX, (x) => (ground + (x * PX - cx) * slope) / PX, (vh * 0.035) / PX));
     // The effects layer covers the scene itself (no margin).
     const FW = Math.ceil(W / PX), FH = Math.ceil(H / PX);
     flyers.resize(FW, FH, PX);
