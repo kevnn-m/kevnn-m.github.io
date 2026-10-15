@@ -105,7 +105,7 @@ export function mountScene(root: HTMLElement) {
     for (const c of root.querySelectorAll<HTMLCanvasElement>('canvas')) fit(c, AW, AH);
 
     sky.resize(AW, AH, pal);
-    sky.draw(running ? clock(last) : STILL_T); // resizing cleared the canvas
+    sky.draw(sceneTime(last)); // resizing cleared the canvas
     paintFar(layers.far, AW, AH, pal);
     paintMid(layers.mid, AW, AH, pal);
     paintNear(nearC, AW, AH, pal);
@@ -141,7 +141,7 @@ export function mountScene(root: HTMLElement) {
     fit(fxC, FW, FH);
     flyers.night = pal.night;
     vig.layout(MARGIN, PX);
-    render(running ? clock(last) : STILL_T, 0);
+    render(sceneTime(last), 0);
   }
 
   // Parallax: layers follow the pointer by different amounts, in whole art pixels.
@@ -180,13 +180,14 @@ export function mountScene(root: HTMLElement) {
   let visible = true, running = false, raf = 0, last = 0;
   const start = performance.now();
   const clock = (now: number) => STILL_T + (now - start) / 1000;
+  // Without WebGL the grass is a still image, so the wind clock stays still too.
+  const sceneTime = (now: number) => (running && field.webgl ? clock(now) : STILL_T);
   const frame = (now: number) => {
     raf = requestAnimationFrame(frame);
     if (now - last < 1000 / FPS - 2) return;
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
-    // Without WebGL the grass is a still image, so the wind clock stays still too.
-    render(field.webgl ? clock(now) : STILL_T, dt);
+    render(sceneTime(now), dt);
   };
   function update() {
     cancelAnimationFrame(raf);
@@ -208,18 +209,21 @@ export function mountScene(root: HTMLElement) {
     });
   }).observe(root);
 
-  // If the GPU drops a canvas (driver reset, too many tabs), rebuild when it comes back.
+  // If the GPU drops a canvas (driver reset, too many tabs), rebuild it when
+  // it comes back. Each grass canvas is rebuilt only by its own restore event;
+  // 2D canvases come back blank and just need repainting.
   root.addEventListener('webglcontextlost', (e) => e.preventDefault(), true);
-  const rebuild = () => {
+  const relayout = () => {
     cancelAnimationFrame(pending);
-    pending = requestAnimationFrame(() => {
-      field = createGrass($<HTMLCanvasElement>('.l-field'));
-      front = createGrass($<HTMLCanvasElement>('.l-front'));
-      layout();
-    });
+    pending = requestAnimationFrame(layout);
   };
-  root.addEventListener('webglcontextrestored', rebuild, true);
-  root.addEventListener('contextrestored', rebuild, true);
+  root.addEventListener('webglcontextrestored', (e) => {
+    const c = e.target as HTMLCanvasElement;
+    if (c.classList.contains('l-field')) field = createGrass(c);
+    if (c.classList.contains('l-front')) front = createGrass(c);
+    relayout();
+  }, true);
+  root.addEventListener('contextrestored', relayout, true);
   reduced.addEventListener('change', update);
   dark.addEventListener('change', () => { pal = dark.matches ? NIGHT : DAY; layout(); });
 

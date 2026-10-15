@@ -57,9 +57,16 @@ const svg = vignetteSvg.replace('aria-label="Cat"', `aria-label="${catName}"`);
   /* The script sets the exact place and size; this is the spot before it runs. */
   .vignette { position: absolute; left: 20%; bottom: 8%; width: 56%; pointer-events: none; }
   .vignette :global(svg) { position: relative; display: block; width: 100%; height: auto; pointer-events: none; overflow: visible; }
-  .vignette :global(svg a), .vignette :global(svg #cat) { pointer-events: auto; cursor: pointer; outline: none; }
-  /* Once the script draws the pixel copy, the SVG stays only for links, focus and hover. */
+  .vignette :global(svg a), .vignette :global(svg #cat) { pointer-events: auto; cursor: pointer; }
+  /* Once the script draws the pixel copy, the SVG stays only for links, focus and
+     hover, and the script draws the focus outline. Without the script, the site's
+     normal focus ring shows on the SVG. */
   .vignette[data-raster] :global(svg) { opacity: 0; }
+  .vignette[data-raster] :global(svg :is(a, #cat)) { outline: none; }
+  /* With JavaScript, keep the drawing hidden until the scene has placed it
+     (shown anyway after 3 s, in case the script fails). */
+  :global(.js) .scene:not([data-ready]) .vignette { visibility: hidden; animation: vg-show 0s 3s forwards; }
+  @keyframes vg-show { to { visibility: visible; } }
   .vignette :global(.vignette-art) { position: absolute; image-rendering: pixelated; image-rendering: crisp-edges; }
   @media (prefers-color-scheme: dark) {
     .vignette :global(:is(svg, .vignette-art)) { filter: brightness(0.6) saturate(0.85); }

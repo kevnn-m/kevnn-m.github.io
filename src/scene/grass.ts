@@ -141,6 +141,7 @@ class WebGLGrass implements GrassRenderer {
 
   setBlades(data: Float32Array) {
     const gl = this.gl;
+    if (gl.isContextLost()) return;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.inst);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
     this.count = data.length / BLADE_FLOATS;
@@ -155,6 +156,7 @@ class WebGLGrass implements GrassRenderer {
 
   draw(t: number, c: GrassColors, gustStrength: number) {
     const { gl, u } = this;
+    if (gl.isContextLost()) return; // wait for the restore event
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.useProgram(this.prog);
