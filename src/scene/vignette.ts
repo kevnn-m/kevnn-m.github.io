@@ -69,7 +69,7 @@ export class Vignette {
   private focused: SVGElement | null = null;
   private pinged: SVGElement | null = null; // pointed out for a moment (the butterfly's visit)
   private active = new Set<SVGElement>(); // outlined, with a raised label
-  private dismissed = new Set<SVGElement>(); // hidden with Escape until the pointer or focus leaves them
+  private dismissed = new Set<SVGElement>(); // lowered with Escape until the pointer leaves them
   private flickStart = -1;
   private bubbleTimer = 0;
   private pingTimer = 0;
@@ -151,7 +151,7 @@ export class Vignette {
       el.addEventListener('pointerenter', () => hover(true));
       el.addEventListener('pointerleave', () => hover(false));
       el.addEventListener('focus', () => { this.focused = el.matches(':focus-visible') ? el : null; this.refresh(); });
-      el.addEventListener('blur', () => { this.focused = null; this.dismissed.delete(el); this.refresh(); });
+      el.addEventListener('blur', () => { this.focused = null; this.refresh(); });
 
       // Its label works like the object for the mouse and touch. It is hidden
       // from screen readers; the object itself has the same name.
@@ -161,7 +161,8 @@ export class Vignette {
       tag.textContent = el.getAttribute('aria-label') ?? '';
       tag.addEventListener('pointerenter', () => hover(true));
       tag.addEventListener('pointerleave', () => hover(false));
-      tag.addEventListener('click', (e) => this.activate(el, e));
+      // cancelable, so the popup objects can stop it from following their link
+      tag.addEventListener('click', () => el.dispatchEvent(new MouseEvent('click', { cancelable: true })));
       tagLayer?.append(tag);
       this.tags.set(el, tag);
 
@@ -174,15 +175,18 @@ export class Vignette {
       el.setAttribute('aria-haspopup', 'dialog');
       el.setAttribute('aria-expanded', 'false');
       el.setAttribute('aria-controls', pop.id);
-      el.addEventListener('click', (e) => this.activate(el, e));
+      el.addEventListener('click', (e) => {
+        // Ctrl-, Cmd- or Shift-click on a link still opens its page in a new tab or window.
+        if (el.hasAttribute('href') && (e.ctrlKey || e.metaKey || e.shiftKey)) return;
+        e.preventDefault();
+        this.toggle(el);
+      });
       el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggle(el); }
-        if (e.key === 'Escape') this.escape();
       });
       // Moving focus away from the cat while it says "mrrp" cancels the popup.
       el.addEventListener('blur', (e) => { if (!pop.contains(e.relatedTarget as Node)) this.cancelPoke(); });
       pop.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') this.escape();
         // The popup sits outside the drawing, so Tab would leave the scene. Instead,
         // Shift+Tab from its first control goes back to the object, and Tab from its
         // last control goes on from the object to the next one.
@@ -205,10 +209,18 @@ export class Vignette {
       this.cancelPoke();
       this.closePop(false);
     });
-    // Escape takes away the outlines and raised labels showing now (WCAG 1.4.13), without moving focus.
+    // Escape closes the popup (or stops the "mrrp"); focus goes back to the
+    // object only if it was in the popup. Otherwise Escape lowers the raised
+    // label and outline of the hovered object (WCAG 1.4.13). The focus ring stays.
     document.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape' || !this.active.size) return;
-      for (const el of [this.focused, this.hovered]) if (el) this.dismissed.add(el);
+      if (e.key !== 'Escape') return;
+      if (this.openPop || this.poking) {
+        const inPop = !!this.openPop && this.pops.get(this.openPop)!.contains(document.activeElement);
+        this.cancelPoke();
+        this.closePop(inPop);
+        return;
+      }
+      if (this.hovered) this.dismissed.add(this.hovered);
       this.ping(null);
     });
   }
@@ -221,7 +233,7 @@ export class Vignette {
   }
 
   /** Show a box (bubble, popup) above an element, kept inside the scene. */
-  private place(box: HTMLElement, el: Element, gap = 8) {
+  private place(box: HTMLElement, el: Element) {
     box.hidden = false; // must be visible to measure
     const r = this.rectIn(el);
     const W = this.root.clientWidth;
@@ -229,13 +241,13 @@ export class Vignette {
     const lo = 8 + half, hi = W - 11 - half; // 11: room for the 3px block shadow
     const cx = r.x + r.w / 2;
     box.style.left = `${lo > hi ? W / 2 : Math.min(hi, Math.max(lo, cx))}px`;
-    box.style.top = `${Math.max(box.offsetHeight + 6, r.y - gap)}px`;
+    box.style.top = `${Math.max(box.offsetHeight + 6, r.y - 4)}px`;
   }
 
   /** Update the outlines and labels from the hover, focus, ping and popup state. */
   private refresh() {
-    const show = (el: SVGElement | null) => (el && !this.dismissed.has(el) ? el : null);
-    this.active = new Set([show(this.focused), show(this.hovered), this.pinged].filter((el): el is SVGElement => !!el));
+    const hovered = this.hovered && !this.dismissed.has(this.hovered) ? this.hovered : null;
+    this.active = new Set([this.focused, hovered, this.pinged].filter((el): el is SVGElement => !!el));
     for (const [el, tag] of this.tags) {
       tag.hidden = el === this.openPop || el === this.poking; // the popup or "mrrp" takes its place
       tag.classList.toggle('is-active', this.active.has(el));
@@ -243,21 +255,9 @@ export class Vignette {
     this.compose();
   }
 
-  /** A click on an object or its label: open its popup, or follow its link. */
-  private activate(el: SVGElement, e: MouseEvent) {
-    if (this.pops.has(el)) {
-      // Ctrl-, Cmd- or Shift-click on a link still opens its page in a new tab or window.
-      if (e.currentTarget === el && el.hasAttribute('href') && (e.ctrlKey || e.metaKey || e.shiftKey)) return;
-      e.preventDefault();
-      this.toggle(el);
-    } else if (e.currentTarget !== el) {
-      const href = el.getAttribute('href');
-      if (href) location.assign(href); // a label: go where its object goes
-    }
-  }
-
   private toggle(el: SVGElement) {
     if (this.openPop === el) { this.closePop(true); return; }
+    this.cancelPoke();
     this.closePop(false);
     if (el.id === 'cat') this.poke(el);
     else this.open(el);
@@ -268,7 +268,7 @@ export class Vignette {
     const pop = this.pops.get(el);
     if (!pop) return;
     this.openPop = el;
-    this.place(pop, el, 4);
+    this.place(pop, el);
     el.setAttribute('aria-expanded', 'true');
     if (document.activeElement === el) pop.querySelector<HTMLElement>('a')?.focus({ preventScroll: true });
     this.refresh();
@@ -278,7 +278,7 @@ export class Vignette {
   private poke(cat: SVGElement) {
     if (!this.reduced()) this.flickStart = performance.now() / 1000;
     this.poking = cat;
-    this.place(this.bubble, cat, 4);
+    this.place(this.bubble, cat);
     clearTimeout(this.bubbleTimer);
     this.bubbleTimer = window.setTimeout(() => {
       this.bubble.hidden = true;
@@ -292,11 +292,6 @@ export class Vignette {
     clearTimeout(this.bubbleTimer);
     this.bubble.hidden = true;
     if (this.poking) { this.poking = null; this.refresh(); }
-  }
-
-  private escape() {
-    this.cancelPoke();
-    this.closePop(true);
   }
 
   private closePop(returnFocus: boolean) {
@@ -313,15 +308,15 @@ export class Vignette {
    * Point out an object for a moment: outline it and raise its label with a
    * small hop (the butterfly's visit). null ends it.
    */
-  ping(el: SVGElement | null, ms = 1400) {
+  ping(el: SVGElement | null) {
     clearTimeout(this.pingTimer);
+    if (this.pinged) this.tags.get(this.pinged)?.classList.remove('is-pinged'); // end the last hop
     this.pinged = el;
     const tag = el && this.tags.get(el);
     if (tag) {
-      tag.classList.remove('is-pinged');
       void tag.offsetWidth; // restart the hop
       tag.classList.add('is-pinged');
-      this.pingTimer = window.setTimeout(() => this.ping(null), ms);
+      this.pingTimer = window.setTimeout(() => this.ping(null), 1400);
     }
     this.refresh();
   }
@@ -506,8 +501,8 @@ export class Vignette {
       }
       this.placeTags();
     }
-    if (this.openPop) this.place(this.pops.get(this.openPop)!, this.openPop, 4);
-    if (this.poking) this.place(this.bubble, this.poking, 4);
+    if (this.openPop) this.place(this.pops.get(this.openPop)!, this.openPop);
+    if (this.poking) this.place(this.bubble, this.poking);
   }
 
   /** Where flying pages start: the top sheet of the stack, in art px (without the parallax shift). */

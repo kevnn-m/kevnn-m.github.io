@@ -104,6 +104,7 @@ export function mountScene(root: HTMLElement) {
     if (!W || !H) return;
     laidW = W;
     laidH = H;
+    butterfly.leave(); // its stops would be out of date
     PX = pixelSize(W);
     const PW = W + MARGIN * 2, PH = H + MARGIN * 2;
     const AW = Math.ceil(PW / PX), AH = Math.ceil(PH / PX); // layer size in art px
@@ -112,7 +113,8 @@ export function mountScene(root: HTMLElement) {
       c.style.width = `${w * PX}px`;
       c.style.height = `${h * PX}px`;
     };
-    for (const c of root.querySelectorAll<HTMLCanvasElement>('canvas')) fit(c, AW, AH);
+    // (The drawing's own canvas is sized by the Vignette.)
+    for (const c of root.querySelectorAll<HTMLCanvasElement>('canvas:not(.vignette-art)')) fit(c, AW, AH);
 
     sky.resize(AW, AH, pal);
     sky.draw(sceneTime(last)); // resizing cleared the canvas
@@ -195,8 +197,8 @@ export function mountScene(root: HTMLElement) {
 
   // The butterfly's tour, once per visit: it starts a moment after the
   // drawing is ready, while the scene is on screen with motion allowed.
-  // Pressing anything in the scene sends it away. (?tour in the address
-  // shows it again.)
+  // Pressing anything in the scene, or moving focus into it, sends it away
+  // (or stops it from starting). ?tour in the address shows it again.
   let tourWait = 1.2;
   let toured = (() => {
     try { return !new URLSearchParams(location.search).has('tour') && sessionStorage.getItem('scene-tour') === '1'; } catch { return false; }
@@ -208,7 +210,7 @@ export function mountScene(root: HTMLElement) {
     const stops = vig.tourStops();
     butterfly.start(stops, FW, (i) => vig.ping(stops[i].el), () => vig.ping(null));
   }
-  for (const type of ['pointerdown', 'keydown']) root.addEventListener(type, () => butterfly.leave());
+  for (const type of ['pointerdown', 'keydown', 'focusin']) root.addEventListener(type, () => { toured = true; butterfly.leave(); });
 
   // Animation loop: runs only while on screen, with motion allowed.
   // The clock starts at the still frame's time, so nothing jumps when motion starts.

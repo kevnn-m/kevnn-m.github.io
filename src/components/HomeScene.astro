@@ -1,8 +1,8 @@
 ---
 // Illustrated banner: a painted landscape with grass in the wind (code-drawn
 // layers) and the character illustration (src/scene/art/vignette.svg).
-// The objects in the illustration are real links. With JavaScript, the book,
-// the camera and the cat open a popup instead (data-pop in the SVG).
+// The objects in the illustration are real links; the cat is a button.
+// With JavaScript, the book, the camera and the cat open a popup (data-pop in the SVG).
 import vignetteSvg from '../scene/art/vignette.svg?raw';
 import { SITE } from '../site';
 
@@ -80,7 +80,7 @@ const pops = [
     .vignette :global(:is(svg, .vignette-art)) { filter: brightness(0.6) saturate(0.85); }
   }
 
-  /* Labels: quiet tags that stay by each object, raised (bolder) on hover,
+  /* Labels: quiet tags that stay by each object, raised (into a box) on hover,
      focus, or the butterfly's visit. They move with the plane (parallax).
      The script makes them, so the rules reach them with :global(). */
   .scene-tags { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.6s; }
@@ -129,6 +129,7 @@ const pops = [
   .cat-bubble { padding: 4px 10px; font-style: italic; }
   .scene-pop { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 12px; white-space: nowrap; }
   .scene-pop a { color: #2f5fa7; text-decoration: underline; text-underline-offset: 3px; }
+  .scene-pop :focus-visible { outline-color: #2b2420; } /* the popup stays light in dark mode */
   .pop-close {
     border: 0; background: none; font-size: 1.2rem; line-height: 1; cursor: pointer;
     color: #5f6670; padding: 2px 6px; border-radius: 6px;

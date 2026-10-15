@@ -118,7 +118,7 @@
 <path d="M54.5,393.5L83,335.5" fill="none" stroke="#cbbd9c" stroke-width="7" stroke-dasharray="2.6 2.4"/>
 <path d="M945.5,394.2L917.5,337" fill="none" stroke="#cbbd9c" stroke-width="7" stroke-dasharray="2.6 2.4"/>
 </g>
-<a id="link-papers" href="#publications" aria-label="Publications" data-label="150 316">
+<a id="link-papers" href="#publications" aria-label="Publications" data-label="112 322">
 <g id="papers">
 <path d="M75.6,390.8L157.7,383.5L144.4,357.2L62.3,364.5Z" fill="#fbf6ea"/><path d="M75.6,390.8L157.7,383.5L144.4,357.2L62.3,364.5Z" fill="none" stroke="#8f7c62" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M76.9,367.1L130.1,362.3M77,377.4L143.5,371.4M81.9,387.2L121.8,383.7" fill="none" stroke="#9aaecb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
@@ -163,7 +163,7 @@
 <path d="M123,332.7L125.2,332.3L126.4,338.2L124.2,338.6Z" fill="#c0c3c8"/>
 </g>
 </g></a>
-<a id="link-person" href="#about" aria-label="About me" data-label="245 252">
+<a id="link-person" href="#about" aria-label="About me" data-label="205 252">
 <g id="person">
 <use href="#kv-fhand2" fill="#e7a987"/>
 <g clip-path="url(#kv-fhand2c)">
