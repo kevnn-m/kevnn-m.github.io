@@ -98,10 +98,16 @@ export function mountScene(root: HTMLElement) {
         px(s.x, s.y);
       }
       if (pal.moon) {
+        // Crescent: a disc with a second, offset disc cut out of it.
         ctx.fillStyle = pal.moon;
-        const mx = W - 24, my = 5;
-        ctx.fillRect(mx + 1, my, 4, 6);
-        ctx.fillRect(mx, my + 1, 6, 4);
+        const mx = W - 22, my = 9;
+        for (let dy = -5; dy <= 5; dy++) {
+          for (let dx = -5; dx <= 5; dx++) {
+            const inDisc = dx * dx + dy * dy <= 25;
+            const inCut = (dx - 2.4) ** 2 + dy * dy <= 4.6 ** 2;
+            if (inDisc && !inCut) px(mx + dx, my + dy);
+          }
+        }
       }
     } else {
       [0, 1, 2].forEach((i) => {
